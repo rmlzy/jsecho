@@ -5,6 +5,11 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
+import {
+  IPaginationOptions,
+  paginate,
+  Pagination,
+} from 'nestjs-typeorm-paginate';
 import { Content, Relationship } from '../../entities';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
@@ -20,8 +25,6 @@ export class ContentsService {
     private metaService: MetasService,
     private connection: Connection,
   ) {}
-
-  async findMaxId() {}
 
   async create(createContentDto: CreateContentDto) {
     const { slug, date, categories, tags, ...rest } = createContentDto;
@@ -60,8 +63,8 @@ export class ContentsService {
     return null;
   }
 
-  findAll() {
-    return this.contentRepo.find();
+  async paginate(options: IPaginationOptions): Promise<Pagination<Content>> {
+    return paginate(this.contentRepo, options);
   }
 
   findById(cid: number) {

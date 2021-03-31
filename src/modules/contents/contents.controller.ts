@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
   HttpStatus,
 } from '@nestjs/common';
 import { ContentsService } from './contents.service';
@@ -23,8 +24,9 @@ export class ContentsController {
   }
 
   @Get()
-  async findAll() {
-    const res = await this.contentsService.findAll();
+  async paginate(@Query('page') page = 1, @Query('limit') limit = 10) {
+    limit = limit > 100 ? 100 : limit;
+    const res = await this.contentsService.paginate({ page, limit });
     return { statusCode: HttpStatus.OK, message: 'OK', data: res };
   }
 
