@@ -6,11 +6,10 @@ import {
   Module,
 } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { RedisModule } from 'nestjs-redis';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { getEnvFilePath } from './utils';
+import config from './config';
 import { AppController } from './app.controller';
 
 // Modules
@@ -32,39 +31,33 @@ import { Content } from './modules/contents/entities/content.entity';
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,
-      envFilePath: getEnvFilePath(),
+      load: [config],
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         type: 'mysql',
-        host: config.get('MYSQL_HOST'),
-        port: config.get('MYSQL_PORT'),
-        username: config.get('MYSQL_USERNAME'),
-        password: config.get('MYSQL_PASSWORD'),
-        database: config.get('MYSQL_DATABASE'),
+        host: config.get('MYSQL.HOST'),
+        port: config.get('MYSQL.PORT'),
+        username: config.get('MYSQL.USERNAME'),
+        password: config.get('MYSQL.PASSWORD'),
+        database: config.get('MYSQL.DATABASE'),
         entities: [User, Option, Meta, Content],
         synchronize: true,
-      }),
-    }),
-    RedisModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        url: config.get('REDIS_URI'),
       }),
     }),
     CacheModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        ttl: +config.get('CACHE_TTL'),
-        max: +config.get('CACHE_MAX'),
+        ttl: +config.get('CACHE.TTL'),
+        max: +config.get('CACHE.MAX'),
       }),
     }),
     ThrottlerModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        ttl: +config.get('THROTTLER_TTL'),
-        limit: +config.get('THROTTLER_LIMIT'),
+        ttl: +config.get('THROTTLER.TTL'),
+        limit: +config.get('THROTTLER.LIMIT'),
       }),
     }),
     ScheduleModule.forRoot(),
