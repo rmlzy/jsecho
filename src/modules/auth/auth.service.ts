@@ -23,7 +23,7 @@ export class AuthService {
       throw new HttpException('用户名或密码无效', 409);
     }
     const payload = { uid: user.uid, name, group: user.group };
-    // TODO: 添加过期时间
+    // TODO: 添加过期时间 expiresIn
     const token = this.jwtService.sign(payload);
     await this.usersService.update(user.uid, {
       logged: getTimestamp(),

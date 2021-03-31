@@ -9,7 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import config from './config';
+import environment from './environments';
 import { AppController } from './app.controller';
 
 // Modules
@@ -29,7 +29,7 @@ import * as entities from './entities';
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,
-      load: [config],
+      load: [environment],
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],

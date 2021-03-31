@@ -8,17 +8,6 @@ export const isXss = (text: string) => {
 
 export const isDevelop = () => process.env.NODE_ENV === 'development';
 
-export const getEnvFilePath = () => {
-  let filePath = '.env.development';
-  if (process.env.NODE_ENV === 'development') {
-    filePath = '.env.development';
-  }
-  if (process.env.NODE_ENV === 'production') {
-    filePath = '.env.production';
-  }
-  return filePath;
-};
-
 export const getTimestamp = (date?: string) => {
   const d = dayjs(date);
   return d.unix();
@@ -43,4 +32,20 @@ export const optionsToMap = (options) => {
     output[option.name] = option.value;
   });
   return output;
+};
+
+export const paginateToRes = (pageRes) => {
+  const { items, meta } = pageRes;
+  const { currentPage, itemsPerPage, totalItems } = meta;
+  return {
+    items,
+    total: totalItems,
+    pageIndex: currentPage,
+    pageSize: itemsPerPage,
+  };
+};
+
+export const queryToPaginate = (query) => {
+  const { pageIndex, pageSize, ...rest } = query;
+  return { page: pageIndex, limit: pageSize, ...rest };
 };

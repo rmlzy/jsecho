@@ -12,7 +12,7 @@ export class AuthController {
   @ApiOperation({ description: '登录' })
   async login(@Body() loginDto: LoginDto) {
     const doc = await this.authService.login(loginDto);
-    return { statusCode: HttpStatus.OK, message: 'OK', data: doc };
+    return { code: HttpStatus.OK, message: 'OK', data: doc };
   }
 
   @Post('/logout')
@@ -27,6 +27,6 @@ export class AuthController {
   async logout(@Headers() headers) {
     const token = headers['x-authorization'];
     const doc = await this.authService.logout(token);
-    return { statusCode: HttpStatus.OK, message: 'OK', data: doc };
+    return { code: HttpStatus.OK, message: 'OK', data: doc };
   }
 }

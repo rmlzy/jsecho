@@ -30,7 +30,7 @@ export class UsersController {
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
     const res = await this.usersService.create(createUserDto);
-    return { statusCode: HttpStatus.OK, message: 'OK', data: res };
+    return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
   @ApiOperation({ description: '用户列表' })
@@ -38,7 +38,7 @@ export class UsersController {
   @Get()
   async findAll() {
     const res = await this.usersService.findAll();
-    return { statusCode: HttpStatus.OK, message: 'OK', data: res };
+    return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
   @ApiOperation({ description: '创建用户' })
@@ -46,13 +46,13 @@ export class UsersController {
   @Get(':uid')
   async findOne(@Param('uid') uid: string) {
     const res = await this.usersService.findOne(+uid);
-    return { statusCode: HttpStatus.OK, message: 'OK', data: res };
+    return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
   @Get(':uid/options')
   async findOptions(@Param('uid') uid: string) {
     const res = await this.optionsService.findByUid(+uid);
-    return { statusCode: HttpStatus.OK, message: 'OK', data: res };
+    return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
   @Patch(':uid/profile')
@@ -62,7 +62,7 @@ export class UsersController {
     @Body() updateProfileDto: UpdateProfileDto,
   ) {
     const res = await this.usersService.updateProfile(+uid, updateProfileDto);
-    return { statusCode: HttpStatus.OK, message: 'OK', data: res };
+    return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
   @Patch(':uid/password')
@@ -72,13 +72,13 @@ export class UsersController {
     @Body() updatePasswordDto: UpdatePasswordDto,
   ) {
     const res = await this.usersService.updatePassword(+uid, updatePasswordDto);
-    return { statusCode: HttpStatus.OK, message: 'OK', data: res };
+    return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
   @Delete(':uid')
   @UseGuards(JwtAuthGuard)
   async remove(@Param('uid') uid: string) {
     const res = await this.usersService.remove(+uid);
-    return { statusCode: HttpStatus.OK, message: 'OK', data: res };
+    return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 }

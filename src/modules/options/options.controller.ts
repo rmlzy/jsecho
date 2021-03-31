@@ -10,12 +10,12 @@ export class OptionsController {
   @Get()
   async findAll() {
     const res = await this.optionService.findAll();
-    return { statusCode: HttpStatus.OK, message: 'OK', data: res };
+    return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
   @Get('default')
   async findDefault() {
     const res = await this.optionService.findDefault();
-    return { statusCode: HttpStatus.OK, message: 'OK', data: res };
+    return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 }

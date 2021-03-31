@@ -21,7 +21,7 @@ import { AuthController } from './auth.controller';
     }),
   ],
   providers: [AuthService, JwtStrategy],
-  exports: [PassportModule.register({ defaultStrategy: 'jwt' })], // 删除???
+  exports: [],
   controllers: [AuthController],
 })
 export class AuthModule {}

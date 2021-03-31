@@ -22,21 +22,21 @@ export class MetasController {
   @Post()
   async create(@Body() createMetaDto: CreateMetaDto) {
     const res = await this.metasService.create(createMetaDto);
-    return { statusCode: HttpStatus.OK, message: 'OK', data: res };
+    return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
   @ApiOperation({ description: '查看分类列表' })
   @Get()
   async findAll() {
     const res = await this.metasService.findAll();
-    return { statusCode: HttpStatus.OK, message: 'OK', data: res };
+    return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
   @ApiOperation({ description: '查看分类详情' })
   @Get(':mid')
   async findOne(@Param('mid') mid: string) {
     const res = await this.metasService.findById(+mid);
-    return { statusCode: HttpStatus.OK, message: 'OK', data: res };
+    return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
   @ApiOperation({ description: '更新分类' })
@@ -46,13 +46,13 @@ export class MetasController {
     @Body() updateMetaDto: UpdateMetaDto,
   ) {
     const res = await this.metasService.update(+mid, updateMetaDto);
-    return { statusCode: HttpStatus.OK, message: 'OK', data: res };
+    return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
   @ApiOperation({ description: '删除分类' })
   @Delete(':mid')
   async remove(@Param('mid') mid: string) {
     const res = await this.metasService.remove(+mid);
-    return { statusCode: HttpStatus.OK, message: 'OK', data: res };
+    return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 }

@@ -5,15 +5,11 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
-import {
-  IPaginationOptions,
-  paginate,
-  Pagination,
-} from 'nestjs-typeorm-paginate';
-import { Content, Relationship } from '../../entities';
+import { paginateRaw } from 'nestjs-typeorm-paginate';
+import { Content, Relationship, User } from '../../entities';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
-import { getTimestamp, removeEmptyColumns } from '../../utils';
+import { getTimestamp, paginateToRes, removeEmptyColumns } from '../../utils';
 import { MetasService } from '../metas/metas.service';
 import { RelationshipsService } from '../relationships/relationships.service';
 
@@ -63,8 +59,19 @@ export class ContentsService {
     return null;
   }
 
-  async paginate(options: IPaginationOptions): Promise<Pagination<Content>> {
-    return paginate(this.contentRepo, options);
+  async paginate(options) {
+    const { pageIndex, pageSize } = options;
+    // TODO: 获取分类
+    const contents = this.contentRepo
+      .createQueryBuilder('c')
+      .orderBy('c.created', 'DESC')
+      .leftJoinAndSelect(User, 'u', 'u.uid = c.authorId')
+      .select(['c.*', 'u.screenName as authorName']);
+    const rows = await paginateRaw(contents, {
+      page: pageIndex,
+      limit: pageSize,
+    });
+    return paginateToRes(rows);
   }
 
   findById(cid: number) {

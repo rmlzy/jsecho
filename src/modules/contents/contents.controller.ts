@@ -8,46 +8,52 @@ import {
   Delete,
   Query,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { ContentsService } from './contents.service';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
+import { JwtAuthGuard } from '../auth/jwt-guard';
 
 @Controller('contents')
 export class ContentsController {
   constructor(private readonly contentsService: ContentsService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   async create(@Body() createContentDto: CreateContentDto) {
     const res = await this.contentsService.create(createContentDto);
-    return { statusCode: HttpStatus.OK, message: 'OK', data: res };
+    return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
   @Get()
-  async paginate(@Query('page') page = 1, @Query('limit') limit = 10) {
-    limit = limit > 100 ? 100 : limit;
-    const res = await this.contentsService.paginate({ page, limit });
-    return { statusCode: HttpStatus.OK, message: 'OK', data: res };
+  @UseGuards(JwtAuthGuard)
+  async paginate(@Query() query) {
+    const res = await this.contentsService.paginate(query);
+    return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
   @Get(':cid')
+  @UseGuards(JwtAuthGuard)
   async findOne(@Param('cid') cid: string) {
     const res = await this.contentsService.findById(+cid);
-    return { statusCode: HttpStatus.OK, message: 'OK', data: res };
+    return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
   @Patch(':cid')
+  @UseGuards(JwtAuthGuard)
   async update(
     @Param('cid') cid: string,
     @Body() updateContentDto: UpdateContentDto,
   ) {
     const res = await this.contentsService.update(+cid, updateContentDto);
-    return { statusCode: HttpStatus.OK, message: 'OK', data: res };
+    return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
   @Delete(':cid')
+  @UseGuards(JwtAuthGuard)
   async remove(@Param('cid') cid: string) {
     const res = await this.contentsService.remove(+cid);
-    return { statusCode: HttpStatus.OK, message: 'OK', data: res };
+    return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 }

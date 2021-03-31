@@ -8,6 +8,7 @@ import { setupSwagger } from './swagger';
 import { AppModule } from './app.module';
 import { ValidationPipe } from './pipes/validation.pipe';
 import { isDevelop } from './utils';
+import { HttpExceptionFilter } from './filters';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -15,6 +16,7 @@ async function bootstrap() {
   app.use(compression());
   app.use(helmet());
   // app.use(csurf({ cookie: true }));
+  app.useGlobalFilters(new HttpExceptionFilter());
   app.useStaticAssets(resolve('./src/public'), {
     prefix: '/public/',
   });
