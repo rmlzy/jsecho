@@ -1,1 +1,1 @@
-A Node.js blog client inspired from Typecho.
+A Node.js Blogging Platform inspired from Typecho.

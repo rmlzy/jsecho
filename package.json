@@ -1,7 +1,7 @@
 {
   "name": "jsecho",
   "version": "1.0.0",
-  "description": "A Node.js blog client inspired from Typecho.",
+  "description": "A Node.js Blogging Platform inspired from Typecho.",
   "author": "rmlzy <rmlzy@outlook.com>",
   "private": true,
   "license": "MIT",
