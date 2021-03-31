@@ -19,12 +19,10 @@ import { AuthModule } from './modules/auth/auth.module';
 import { OptionsModule } from './modules/options/options.module';
 import { MetasModule } from './modules/metas/metas.module';
 import { ContentsModule } from './modules/contents/contents.module';
+import { RelationshipsModule } from './modules/relationships/relationships.module';
 
 // Entities
-import { User } from './modules/users/entities/user.entity';
-import { Option } from './modules/options/entities/option.entity';
-import { Meta } from './modules/metas/entities/meta.entity';
-import { Content } from './modules/contents/entities/content.entity';
+import * as entities from './entities';
 
 @Module({
   imports: [
@@ -42,7 +40,7 @@ import { Content } from './modules/contents/entities/content.entity';
         username: config.get('MYSQL.USERNAME'),
         password: config.get('MYSQL.PASSWORD'),
         database: config.get('MYSQL.DATABASE'),
-        entities: [User, Option, Meta, Content],
+        entities: Object.values(entities),
         synchronize: true,
       }),
     }),
@@ -67,6 +65,7 @@ import { Content } from './modules/contents/entities/content.entity';
     OptionsModule,
     MetasModule,
     ContentsModule,
+    RelationshipsModule,
   ],
   controllers: [AppController],
   providers: [

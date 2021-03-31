@@ -17,8 +17,9 @@ export class ContentsController {
   constructor(private readonly contentsService: ContentsService) {}
 
   @Post()
-  create(@Body() createContentDto: CreateContentDto) {
-    return this.contentsService.create(createContentDto);
+  async create(@Body() createContentDto: CreateContentDto) {
+    const res = await this.contentsService.create(createContentDto);
+    return { statusCode: HttpStatus.OK, message: 'OK', data: res };
   }
 
   @Get()

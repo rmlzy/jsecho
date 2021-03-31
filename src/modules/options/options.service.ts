@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateOptionDto } from './dto/create-option.dto';
 import { UpdateOptionDto } from './dto/update-option.dto';
-import { Option } from './entities/option.entity';
+import { Option } from '../../entities';
 import { optionsToMap } from '../../utils';
 
 @Injectable()

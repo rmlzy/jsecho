@@ -1,19 +1,63 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Content } from './entities/content.entity';
+import { Connection, Repository } from 'typeorm';
+import { Content, Relationship } from '../../entities';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
-import { removeEmptyColumns } from '../../utils';
+import { getTimestamp, removeEmptyColumns } from '../../utils';
+import { MetasService } from '../metas/metas.service';
+import { RelationshipsService } from '../relationships/relationships.service';
 
 @Injectable()
 export class ContentsService {
   constructor(
     @InjectRepository(Content) private contentRepo: Repository<Content>,
+    private relationService: RelationshipsService,
+    private metaService: MetasService,
+    private connection: Connection,
   ) {}
 
-  create(createContentDto: CreateContentDto) {
-    return 'This action adds a new content';
+  async findMaxId() {}
+
+  async create(createContentDto: CreateContentDto) {
+    const { slug, date, categories, tags, ...rest } = createContentDto;
+    const slugExisted = await this.contentRepo.findOne({ where: { slug } });
+    if (slugExisted) {
+      throw new HttpException('文章缩略名已经存在', 409);
+    }
+    const timestamp = getTimestamp(date);
+    const content = {
+      ...rest,
+      slug, // 获取下一个ID
+      created: timestamp,
+      modified: timestamp,
+    };
+    const categoryMetas = await this.metaService.findCategoryIds(categories);
+    const tagMetas = await this.metaService.findTagIds(tags);
+    // 事务开始
+    const runner = this.connection.createQueryRunner();
+    await runner.connect();
+    await runner.startTransaction();
+    try {
+      const created = await runner.manager.save(Content, content);
+      const relations = [...categoryMetas, ...tagMetas].map((meta) => ({
+        mid: meta.mid,
+        cid: created['cid'],
+      }));
+      await runner.manager.save(Relationship, relations);
+      await runner.commitTransaction();
+    } catch (e) {
+      await runner.rollbackTransaction();
+      throw new InternalServerErrorException();
+    } finally {
+      await runner.release();
+    }
+    // 事务结束
+    return null;
   }
 
   findAll() {
@@ -45,8 +89,21 @@ export class ContentsService {
     if (!existed) {
       throw new HttpException('资源不存在', 404);
     }
-    // TODO: 校验当前用户权限
-    const removed = await this.contentRepo.delete({ cid });
+    // 事务开始
+    const runner = this.connection.createQueryRunner();
+    await runner.connect();
+    await runner.startTransaction();
+    try {
+      await runner.manager.delete(Relationship, { cid });
+      await runner.manager.delete(Content, { cid });
+      await runner.commitTransaction();
+    } catch (e) {
+      await runner.rollbackTransaction();
+      throw new InternalServerErrorException();
+    } finally {
+      await runner.release();
+    }
+    // 事务结束
     return null;
   }
 }

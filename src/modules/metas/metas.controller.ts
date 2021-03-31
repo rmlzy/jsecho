@@ -35,7 +35,7 @@ export class MetasController {
   @ApiOperation({ description: '查看分类详情' })
   @Get(':mid')
   async findOne(@Param('mid') mid: string) {
-    const res = await this.metasService.findOne(+mid);
+    const res = await this.metasService.findById(+mid);
     return { statusCode: HttpStatus.OK, message: 'OK', data: res };
   }
 

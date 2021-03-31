@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MetasService } from './metas.service';
 import { MetasController } from './metas.controller';
-import { Meta } from './entities/meta.entity';
+import { Meta } from '../../entities';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Meta])],

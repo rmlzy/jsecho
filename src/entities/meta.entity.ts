@@ -4,7 +4,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
   name: 'pp_metas',
 })
 export class Meta {
-  @PrimaryGeneratedColumn('increment')
+  @PrimaryGeneratedColumn()
   mid: number;
 
   @Column({ length: 200 })
