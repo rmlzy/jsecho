@@ -25,5 +25,5 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @IsEnum(['administrator', 'editor', 'contributor', 'subscriber', 'visitor'])
-  type: string;
+  group: string;
 }
