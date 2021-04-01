@@ -11,6 +11,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import environment from './environments';
 import { AppController } from './app.controller';
+import { RoleGuard } from './guards';
 
 // Modules
 import { TaskService } from './schedules/task/task.service';
@@ -22,7 +23,7 @@ import { ContentsModule } from './modules/contents/contents.module';
 import { RelationshipsModule } from './modules/relationships/relationships.module';
 
 // Entities
-import * as entities from './entities';
+import { User, Content, Meta, Option, Relationship } from './entities';
 
 @Module({
   imports: [
@@ -40,7 +41,7 @@ import * as entities from './entities';
         username: config.get('MYSQL.USERNAME'),
         password: config.get('MYSQL.PASSWORD'),
         database: config.get('MYSQL.DATABASE'),
-        entities: Object.values(entities),
+        entities: [User, Content, Meta, Option, Relationship],
         synchronize: true,
       }),
     }),
@@ -77,6 +78,10 @@ import * as entities from './entities';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RoleGuard,
     },
   ],
 })

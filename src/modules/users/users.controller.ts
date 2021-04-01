@@ -8,14 +8,14 @@ import {
   Delete,
   HttpStatus,
   UseGuards,
-  Headers,
+  Query,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
-import { JwtAuthGuard } from '../auth/jwt-guard';
+import { LoggedGuard, Roles } from '../../guards';
 import { OptionsService } from '../options/options.service';
 
 @ApiTags('用户')
@@ -27,7 +27,8 @@ export class UsersController {
   ) {}
 
   @ApiOperation({ description: '创建用户' })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(LoggedGuard)
+  @Roles(['administrator'])
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
     const res = await this.userService.create(createUserDto);
@@ -35,29 +36,34 @@ export class UsersController {
   }
 
   @ApiOperation({ description: '用户列表' })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(LoggedGuard)
+  @Roles(['administrator'])
   @Get()
-  async findAll() {
-    const res = await this.userService.findAll();
+  async paginate(@Query() query) {
+    const res = await this.userService.paginate(query);
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
   @ApiOperation({ description: '查询用户' })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(LoggedGuard)
+  @Roles(['administrator'])
   @Get(':uid')
   async findOne(@Param('uid') uid: string) {
     const res = await this.userService.findByUid(+uid);
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
+  @ApiOperation({ description: '查询用户配置' })
   @Get(':uid/options')
   async findOptions(@Param('uid') uid: string) {
     const res = await this.optionsService.findByUid(+uid);
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
+  @ApiOperation({ description: '更新用户信息' })
+  @UseGuards(LoggedGuard)
+  @Roles(['public'])
   @Patch(':uid/profile')
-  @UseGuards(JwtAuthGuard)
   async updateProfile(
     @Param('uid') uid: string,
     @Body() updateProfileDto: UpdateProfileDto,
@@ -66,8 +72,10 @@ export class UsersController {
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
+  @ApiOperation({ description: '修改密码' })
+  @UseGuards(LoggedGuard)
+  @Roles(['public'])
   @Patch(':uid/password')
-  @UseGuards(JwtAuthGuard)
   async updatePassword(
     @Param('uid') uid: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
@@ -76,8 +84,10 @@ export class UsersController {
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
+  @ApiOperation({ description: '删除用户' })
   @Delete(':uid')
-  @UseGuards(JwtAuthGuard)
+  @Roles(['administrator'])
+  @UseGuards(LoggedGuard)
   async remove(@Param('uid') uid: string) {
     const res = await this.userService.remove(+uid);
     return { code: HttpStatus.OK, message: 'OK', data: res };

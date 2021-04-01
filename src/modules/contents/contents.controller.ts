@@ -13,35 +13,39 @@ import {
 import { ContentsService } from './contents.service';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
-import { JwtAuthGuard } from '../auth/jwt-guard';
+import { LoggedGuard, Roles } from '../../guards';
 
 @Controller('contents')
 export class ContentsController {
   constructor(private readonly contentsService: ContentsService) {}
 
+  @UseGuards(LoggedGuard)
+  @Roles(['administrator', 'editor', 'contributor'])
   @Post()
-  @UseGuards(JwtAuthGuard)
   async create(@Body() createContentDto: CreateContentDto) {
     const res = await this.contentsService.create(createContentDto);
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
+  @UseGuards(LoggedGuard)
+  @Roles(['administrator', 'editor', 'contributor'])
   @Get()
-  @UseGuards(JwtAuthGuard)
   async paginate(@Query() query) {
     const res = await this.contentsService.paginate(query);
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
+  @UseGuards(LoggedGuard)
+  @Roles(['administrator', 'editor', 'contributor'])
   @Get(':cid')
-  @UseGuards(JwtAuthGuard)
   async findOne(@Param('cid') cid: string) {
     const res = await this.contentsService.findById(+cid);
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
+  @UseGuards(LoggedGuard)
+  @Roles(['administrator', 'editor', 'contributor'])
   @Patch(':cid')
-  @UseGuards(JwtAuthGuard)
   async update(
     @Param('cid') cid: string,
     @Body() updateContentDto: UpdateContentDto,
@@ -50,8 +54,9 @@ export class ContentsController {
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
+  @UseGuards(LoggedGuard)
+  @Roles(['administrator', 'editor', 'contributor'])
   @Delete(':cid')
-  @UseGuards(JwtAuthGuard)
   async remove(@Param('cid') cid: string) {
     const res = await this.contentsService.remove(+cid);
     return { code: HttpStatus.OK, message: 'OK', data: res };

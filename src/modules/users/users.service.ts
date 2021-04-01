@@ -5,12 +5,14 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { paginate } from 'nestjs-typeorm-paginate';
 import { User } from '../../entities';
 import {
   generateHashedPassword,
   isXss,
   getTimestamp,
   removeEmptyColumns,
+  paginateToRes,
 } from '../../utils';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -45,9 +47,13 @@ export class UsersService {
     return null;
   }
 
-  async findAll(): Promise<User[]> {
-    const users = await this.userRepo.find();
-    return users;
+  async paginate(options) {
+    const { pageIndex, pageSize } = options;
+    const rows = await paginate(this.userRepo, {
+      page: pageIndex,
+      limit: pageSize,
+    });
+    return paginateToRes(rows);
   }
 
   async findByUid(uid: number): Promise<User> {

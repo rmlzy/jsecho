@@ -1,4 +1,10 @@
-import { IsEmail, IsNotEmpty, MaxLength, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class CreateUserDto {
   // TODO: XSS Check
@@ -16,4 +22,8 @@ export class CreateUserDto {
   @IsEmail({}, { message: '电子邮箱格式错误' })
   @MaxLength(64, { message: '电子邮箱最多包含64个字符' })
   mail: string;
+
+  @IsNotEmpty()
+  @IsEnum(['administrator', 'editor', 'contributor', 'subscriber', 'visitor'])
+  type: string;
 }
