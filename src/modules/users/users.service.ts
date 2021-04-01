@@ -1,4 +1,8 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../entities';
@@ -41,12 +45,14 @@ export class UsersService {
     return null;
   }
 
-  findAll(): Promise<User[]> {
-    return this.userRepo.find();
+  async findAll(): Promise<User[]> {
+    const users = await this.userRepo.find();
+    return users;
   }
 
-  findOne(uid: number): Promise<User> {
-    return this.userRepo.findOne({ where: { uid } });
+  async findByUid(uid: number): Promise<User> {
+    const user = await this.userRepo.findOne({ where: { uid } });
+    return user;
   }
 
   findByNameOrMail(input: string) {
@@ -55,10 +61,17 @@ export class UsersService {
     });
   }
 
-  findByToken(token: string) {
-    return this.userRepo.findOne({
+  async findByToken(token: string) {
+    if (!token) {
+      throw new UnauthorizedException();
+    }
+    const user = await this.userRepo.findOne({
       where: { authCode: token },
     });
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    return user;
   }
 
   async update(uid: number, columns) {

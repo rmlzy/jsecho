@@ -1,5 +1,6 @@
 const xss = require('xss');
 const dayjs = require('dayjs');
+const _ = require('lodash');
 
 export const isXss = (text: string) => {
   const filtered = xss(text);

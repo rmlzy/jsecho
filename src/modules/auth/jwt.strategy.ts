@@ -8,7 +8,7 @@ import { UsersService } from '../users/users.service';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private configService: ConfigService,
-    private usersService: UsersService,
+    private userService: UsersService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromHeader('token'),
@@ -18,13 +18,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(values, done) {
     const { iat, exp, uid } = values;
-    console.log('????');
     const timeDiff = exp - iat;
     if (timeDiff <= 0) {
       throw new UnauthorizedException();
     }
 
-    const user = await this.usersService.findOne(uid);
+    const user = await this.userService.findByUid(uid);
     if (!user) {
       throw new UnauthorizedException();
     }

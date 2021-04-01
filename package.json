@@ -39,6 +39,7 @@
     "express": "^4.17.1",
     "hbs": "^4.1.1",
     "helmet": "^4.4.1",
+    "lodash": "^4.17.21",
     "markdown-it": "^12.0.4",
     "mysql2": "^2.2.5",
     "nestjs-typeorm-paginate": "^2.3.2",

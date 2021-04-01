@@ -8,6 +8,7 @@ import {
   Delete,
   HttpStatus,
   UseGuards,
+  Headers,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { UsersService } from './users.service';
@@ -21,7 +22,7 @@ import { OptionsService } from '../options/options.service';
 @Controller('users')
 export class UsersController {
   constructor(
-    private readonly usersService: UsersService,
+    private readonly userService: UsersService,
     private readonly optionsService: OptionsService,
   ) {}
 
@@ -29,7 +30,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
-    const res = await this.usersService.create(createUserDto);
+    const res = await this.userService.create(createUserDto);
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
@@ -37,15 +38,15 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Get()
   async findAll() {
-    const res = await this.usersService.findAll();
+    const res = await this.userService.findAll();
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
-  @ApiOperation({ description: '创建用户' })
+  @ApiOperation({ description: '查询用户' })
   @UseGuards(JwtAuthGuard)
   @Get(':uid')
   async findOne(@Param('uid') uid: string) {
-    const res = await this.usersService.findOne(+uid);
+    const res = await this.userService.findByUid(+uid);
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
@@ -61,7 +62,7 @@ export class UsersController {
     @Param('uid') uid: string,
     @Body() updateProfileDto: UpdateProfileDto,
   ) {
-    const res = await this.usersService.updateProfile(+uid, updateProfileDto);
+    const res = await this.userService.updateProfile(+uid, updateProfileDto);
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
@@ -71,14 +72,14 @@ export class UsersController {
     @Param('uid') uid: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
   ) {
-    const res = await this.usersService.updatePassword(+uid, updatePasswordDto);
+    const res = await this.userService.updatePassword(+uid, updatePasswordDto);
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
   @Delete(':uid')
   @UseGuards(JwtAuthGuard)
   async remove(@Param('uid') uid: string) {
-    const res = await this.usersService.remove(+uid);
+    const res = await this.userService.remove(+uid);
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 }
