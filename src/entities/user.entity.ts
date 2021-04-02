@@ -10,7 +10,7 @@ export class UserEntity {
   @Column({ length: 32, default: '' })
   name: string;
 
-  @Column({ length: 64, default: '' })
+  @Column({ length: 64, default: '', select: false })
   password: string;
 
   @Column({ length: 200, default: '' })
@@ -31,9 +31,9 @@ export class UserEntity {
   @Column({ unsigned: true, default: 0 })
   logged: number;
 
-  @Column({ length: 255, default: 'visitor' })
+  @Column({ length: 255, default: 'subscriber' })
   group: string;
 
-  @Column({ length: 500, default: '' })
+  @Column({ length: 500, default: '', select: false })
   authCode: string;
 }

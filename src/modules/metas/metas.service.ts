@@ -1,10 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateMetaDto } from './dto/create-meta.dto';
 import { UpdateMetaDto } from './dto/update-meta.dto';
 import { MetaEntity } from '../../entities';
-import { BaseService, isNotXss, removeEmptyColumns } from '../../common';
+import {
+  BaseService,
+  IPaginateResponse,
+  isNotXss,
+  removeEmptyColumns,
+} from '../../common';
 
 @Injectable()
 export class MetasService extends BaseService<MetaEntity> {
@@ -31,13 +36,36 @@ export class MetasService extends BaseService<MetaEntity> {
     return null;
   }
 
-  findAll(): Promise<MetaEntity[]> {
-    return this.metaRepo.find();
+  async paginate({
+    pageIndex,
+    pageSize,
+    type,
+  }): Promise<IPaginateResponse<MetaEntity>> {
+    const [metas, total] = await this.metaRepo.findAndCount({
+      where: { type },
+      order: { mid: 'DESC' },
+      take: pageSize,
+      skip: (pageIndex - 1) * pageSize,
+    });
+    return {
+      items: metas,
+      total,
+      pageIndex,
+      pageSize,
+    };
   }
 
   async findById(mid: number): Promise<MetaEntity> {
     const meta = await this.ensureExist({ mid }, '分类不存在');
     return meta;
+  }
+
+  async findCategoriesByMids(mids: number[]): Promise<MetaEntity[]> {
+    return this.findByMids(mids, 'category');
+  }
+
+  async findTagsByMids(mids: number[]): Promise<MetaEntity[]> {
+    return this.findByMids(mids, 'tag');
   }
 
   async findCategoryIds(ids): Promise<MetaEntity[]> {
@@ -73,6 +101,18 @@ export class MetasService extends BaseService<MetaEntity> {
     return metas;
   }
 
+  async update(mid: number, updateMetaDto: UpdateMetaDto): Promise<void> {
+    await this.ensureExist({ mid }, '资源不存在');
+    await this.metaRepo.update({ mid }, removeEmptyColumns(updateMetaDto));
+    return null;
+  }
+
+  async remove(mid: number): Promise<void> {
+    await this.ensureExist({ mid }, '资源不存在');
+    await this.metaRepo.delete({ mid });
+    return null;
+  }
+
   private async createTagByName(name): Promise<MetaEntity> {
     const meta = new MetaEntity();
     meta.name = name;
@@ -84,15 +124,14 @@ export class MetasService extends BaseService<MetaEntity> {
     return created;
   }
 
-  async update(mid: number, updateMetaDto: UpdateMetaDto): Promise<void> {
-    await this.ensureExist({ mid }, '资源不存在');
-    await this.metaRepo.update({ mid }, removeEmptyColumns(updateMetaDto));
-    return null;
-  }
-
-  async remove(mid: number): Promise<void> {
-    await this.ensureExist({ mid }, '资源不存在');
-    await this.metaRepo.delete({ mid });
-    return null;
+  private async findByMids(
+    mids: number[],
+    type: string,
+  ): Promise<MetaEntity[]> {
+    const metas = await this.metaRepo.find({
+      where: { mid: In(mids), type },
+      select: ['mid', 'name', 'slug', 'type'],
+    });
+    return metas;
   }
 }

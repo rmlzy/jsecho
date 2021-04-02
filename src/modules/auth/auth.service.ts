@@ -28,7 +28,7 @@ export class AuthService extends BaseService<any> {
 
   async login(loginDto: LoginDto) {
     const { name, password } = loginDto;
-    const user = await this.userService.findByNameOrMail(name);
+    const user = await this.userService.findLoginInfoByAccount(name);
     this.asset(ALLOW_LOGIN_GROUPS.includes(user.group), '你无权登录');
 
     const valid = verifyUserPassword(password, user.password);

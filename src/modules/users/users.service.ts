@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Not, Repository } from 'typeorm';
-import { paginate } from 'nestjs-typeorm-paginate';
+import { In, Not, Repository } from 'typeorm';
+import { uniq } from 'lodash';
 import { UserEntity } from '../../entities';
 import { generateHashedPassword, isNotXss, BaseService } from '../../common';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -33,13 +33,18 @@ export class UsersService extends BaseService<UserEntity> {
     return null;
   }
 
-  async paginate(options) {
-    const { pageIndex, pageSize } = options;
-    const rows = await paginate(this.userRepo, {
-      page: pageIndex,
-      limit: pageSize,
+  async paginate({ pageIndex, pageSize }) {
+    const [users, total] = await this.userRepo.findAndCount({
+      order: { uid: 'DESC' },
+      take: pageSize,
+      skip: (pageIndex - 1) * pageSize,
     });
-    return this.parsePaginateRes(rows);
+    return {
+      items: users,
+      total,
+      pageIndex,
+      pageSize,
+    };
   }
 
   async findByUid(uid: number): Promise<UserEntity> {
@@ -47,8 +52,20 @@ export class UsersService extends BaseService<UserEntity> {
     return user;
   }
 
-  async findByNameOrMail(input: string): Promise<UserEntity> {
-    const user = await this.ensureExist([{ name: input }, { mail: input }]);
+  async findByUids(uids: number[]): Promise<UserEntity[]> {
+    uids = uniq(uids);
+    const users = await this.userRepo.find({
+      where: { uid: In(uids) },
+      select: ['uid', 'screenName'],
+    });
+    return users;
+  }
+
+  async findLoginInfoByAccount(nameOrMail: string): Promise<UserEntity> {
+    const user = await this.userRepo.findOne({
+      where: [{ name: nameOrMail }, { mail: nameOrMail }],
+      select: ['uid', 'group', 'password'],
+    });
     return user;
   }
 

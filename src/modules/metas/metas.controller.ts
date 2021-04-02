@@ -7,52 +7,65 @@ import {
   Param,
   Delete,
   HttpStatus,
+  UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { MetasService } from './metas.service';
 import { CreateMetaDto } from './dto/create-meta.dto';
 import { UpdateMetaDto } from './dto/update-meta.dto';
+import { LoggedGuard, Roles } from '../../guards';
 
 @ApiTags('分类')
 @Controller('metas')
 export class MetasController {
-  constructor(private readonly metasService: MetasService) {}
+  constructor(private readonly metaService: MetasService) {}
 
   @ApiOperation({ description: '创建分类' })
+  @UseGuards(LoggedGuard)
+  @Roles(['administrator'])
   @Post()
   async create(@Body() createMetaDto: CreateMetaDto) {
-    const res = await this.metasService.create(createMetaDto);
+    const res = await this.metaService.create(createMetaDto);
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
   @ApiOperation({ description: '查看分类列表' })
+  @UseGuards(LoggedGuard)
+  @Roles(['administrator'])
   @Get()
-  async findAll() {
-    const res = await this.metasService.findAll();
+  async paginate(@Query() query) {
+    const res = await this.metaService.paginate(query);
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
   @ApiOperation({ description: '查看分类详情' })
+  @UseGuards(LoggedGuard)
+  @Roles(['administrator'])
   @Get(':mid')
   async findOne(@Param('mid') mid: string) {
-    const res = await this.metasService.findById(+mid);
+    const res = await this.metaService.findById(+mid);
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
   @ApiOperation({ description: '更新分类' })
+  @UseGuards(LoggedGuard)
+  @Roles(['administrator'])
   @Patch(':mid')
   async update(
     @Param('mid') mid: string,
     @Body() updateMetaDto: UpdateMetaDto,
   ) {
-    const res = await this.metasService.update(+mid, updateMetaDto);
+    const res = await this.metaService.update(+mid, updateMetaDto);
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
   @ApiOperation({ description: '删除分类' })
+  @UseGuards(LoggedGuard)
+  @Roles(['administrator'])
   @Delete(':mid')
   async remove(@Param('mid') mid: string) {
-    const res = await this.metasService.remove(+mid);
+    const res = await this.metaService.remove(+mid);
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 }

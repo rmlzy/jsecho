@@ -1,13 +1,14 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Not, Repository } from 'typeorm';
-import { paginateRaw } from 'nestjs-typeorm-paginate';
+import { keyBy } from 'lodash';
 import { BaseService } from '../../common';
-import { ContentEntity, RelationshipEntity, UserEntity } from '../../entities';
+import { ContentEntity, RelationshipEntity } from '../../entities';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
 import { MetasService } from '../metas/metas.service';
 import { RelationshipsService } from '../relationships/relationships.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class ContentsService extends BaseService<ContentEntity> {
@@ -16,6 +17,7 @@ export class ContentsService extends BaseService<ContentEntity> {
     private contentRepo: Repository<ContentEntity>,
     private relationService: RelationshipsService,
     private metaService: MetasService,
+    private userService: UsersService,
     private connection: Connection,
   ) {
     super(contentRepo);
@@ -54,19 +56,28 @@ export class ContentsService extends BaseService<ContentEntity> {
     return null;
   }
 
-  async paginate(options) {
-    const { pageIndex, pageSize } = options;
-    // TODO: 获取分类
-    const contents = this.contentRepo
-      .createQueryBuilder('c')
-      .orderBy('c.created', 'DESC')
-      .leftJoinAndSelect(UserEntity, 'u', 'u.uid = c.authorId')
-      .select(['c.*', 'u.screenName as authorName']);
-    const rows = await paginateRaw(contents, {
-      page: pageIndex,
-      limit: pageSize,
+  async paginate({ pageIndex, pageSize }) {
+    const [contents, total] = await this.contentRepo.findAndCount({
+      order: { modified: 'DESC' },
+      take: pageSize,
+      skip: (pageIndex - 1) * pageSize,
     });
-    return this.parsePaginateRes(rows);
+    const cids = contents.map((content) => content.cid);
+    const authorIds = contents.map((content) => content.authorId);
+    const authors = keyBy(await this.userService.findByUids(authorIds), 'uid');
+    const categoryMap = await this.relationService.findCategoriesByCids(cids);
+    const items = contents.map((content) => {
+      const categories = categoryMap[content.cid];
+      content['authorName'] = authors[content.authorId]?.screenName || '';
+      content['categories'] = categories || [];
+      return content;
+    });
+    return {
+      items,
+      total,
+      pageIndex,
+      pageSize,
+    };
   }
 
   async findById(cid: number): Promise<ContentEntity> {
