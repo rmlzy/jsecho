@@ -3,7 +3,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 @Entity({
   name: 'pp_users',
 })
-export class User {
+export class UserEntity {
   @PrimaryGeneratedColumn('increment')
   uid: number;
 

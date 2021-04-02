@@ -1,39 +1,34 @@
-import {
-  HttpException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, Repository } from 'typeorm';
+import { Connection, Not, Repository } from 'typeorm';
 import { paginateRaw } from 'nestjs-typeorm-paginate';
-import { Content, Relationship, User } from '../../entities';
+import { BaseService } from '../../common';
+import { ContentEntity, RelationshipEntity, UserEntity } from '../../entities';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
-import { getTimestamp, paginateToRes, removeEmptyColumns } from '../../utils';
 import { MetasService } from '../metas/metas.service';
 import { RelationshipsService } from '../relationships/relationships.service';
 
 @Injectable()
-export class ContentsService {
+export class ContentsService extends BaseService<ContentEntity> {
   constructor(
-    @InjectRepository(Content) private contentRepo: Repository<Content>,
+    @InjectRepository(ContentEntity)
+    private contentRepo: Repository<ContentEntity>,
     private relationService: RelationshipsService,
     private metaService: MetasService,
     private connection: Connection,
-  ) {}
+  ) {
+    super(contentRepo);
+  }
 
   async create(createContentDto: CreateContentDto) {
     const { slug, date, categories, tags, ...rest } = createContentDto;
-    const slugExisted = await this.contentRepo.findOne({ where: { slug } });
-    if (slugExisted) {
-      throw new HttpException('文章缩略名已经存在', 409);
-    }
-    const timestamp = getTimestamp(date);
+    await this.ensureNotExist({ slug }, '文章缩略名已经存在');
     const content = {
       ...rest,
-      slug, // 获取下一个ID
-      created: timestamp,
-      modified: timestamp,
+      slug, // TODO: 获取下一个ID
+      created: this.getTimestamp(date),
+      modified: this.getTimestamp(date),
     };
     const categoryMetas = await this.metaService.findCategoryIds(categories);
     const tagMetas = await this.metaService.findTagIds(tags);
@@ -42,12 +37,12 @@ export class ContentsService {
     await runner.connect();
     await runner.startTransaction();
     try {
-      const created = await runner.manager.save(Content, content);
+      const created = await runner.manager.save(ContentEntity, content);
       const relations = [...categoryMetas, ...tagMetas].map((meta) => ({
         mid: meta.mid,
         cid: created['cid'],
       }));
-      await runner.manager.save(Relationship, relations);
+      await runner.manager.save(RelationshipEntity, relations);
       await runner.commitTransaction();
     } catch (e) {
       await runner.rollbackTransaction();
@@ -65,47 +60,42 @@ export class ContentsService {
     const contents = this.contentRepo
       .createQueryBuilder('c')
       .orderBy('c.created', 'DESC')
-      .leftJoinAndSelect(User, 'u', 'u.uid = c.authorId')
+      .leftJoinAndSelect(UserEntity, 'u', 'u.uid = c.authorId')
       .select(['c.*', 'u.screenName as authorName']);
     const rows = await paginateRaw(contents, {
       page: pageIndex,
       limit: pageSize,
     });
-    return paginateToRes(rows);
+    return this.parsePaginateRes(rows);
   }
 
-  findById(cid: number) {
-    return this.contentRepo.find({ where: { cid } });
+  async findById(cid: number): Promise<ContentEntity> {
+    const content = await this.ensureExist({ cid }, '文章不存在');
+    return content;
   }
 
-  findBySlug(slug: string) {
-    return this.contentRepo.find({ where: { slug } });
+  async findBySlug(slug: string): Promise<ContentEntity> {
+    const content = await this.ensureExist({ slug }, '文章不存在');
+    return content;
   }
 
-  async update(cid: number, updateContentDto: UpdateContentDto) {
-    const existed = await this.contentRepo.findOne({ cid });
-    if (!existed) {
-      throw new HttpException('资源不存在', 404);
-    }
-    await this.contentRepo.update(
-      { cid },
-      removeEmptyColumns(updateContentDto),
-    );
+  async update(cid: number, dto: UpdateContentDto): Promise<void> {
+    const { slug } = dto;
+    await this.ensureExist({ cid }, '文章不存在');
+    await this.ensureNotExist({ cid, slug: Not(slug) }, '文章缩略名已存在');
+    await this.contentRepo.update({ cid }, dto);
     return null;
   }
 
-  async remove(cid: number) {
-    const existed = await this.contentRepo.findOne({ cid });
-    if (!existed) {
-      throw new HttpException('资源不存在', 404);
-    }
+  async remove(cid: number): Promise<void> {
+    await this.ensureExist({ cid }, '文章不存在');
     // 事务开始
     const runner = this.connection.createQueryRunner();
     await runner.connect();
     await runner.startTransaction();
     try {
-      await runner.manager.delete(Relationship, { cid });
-      await runner.manager.delete(Content, { cid });
+      await runner.manager.delete(RelationshipEntity, { cid });
+      await runner.manager.delete(ContentEntity, { cid });
       await runner.commitTransaction();
     } catch (e) {
       await runner.rollbackTransaction();

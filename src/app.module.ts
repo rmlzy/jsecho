@@ -12,18 +12,26 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import environment from './environments';
 import { AppController } from './app.controller';
 import { RoleGuard } from './guards';
+import { TaskService } from './schedules/task/task.service';
 
 // Modules
-import { TaskService } from './schedules/task/task.service';
-import { UsersModule } from './modules/users/users.module';
-import { AuthModule } from './modules/auth/auth.module';
-import { OptionsModule } from './modules/options/options.module';
-import { MetasModule } from './modules/metas/metas.module';
-import { ContentsModule } from './modules/contents/contents.module';
-import { RelationshipsModule } from './modules/relationships/relationships.module';
+import {
+  UsersModule,
+  AuthModule,
+  OptionsModule,
+  MetasModule,
+  ContentsModule,
+  RelationshipsModule,
+} from './modules';
 
 // Entities
-import { User, Content, Meta, Option, Relationship } from './entities';
+import {
+  UserEntity,
+  ContentEntity,
+  MetaEntity,
+  OptionEntity,
+  RelationshipEntity,
+} from './entities';
 
 @Module({
   imports: [
@@ -41,7 +49,13 @@ import { User, Content, Meta, Option, Relationship } from './entities';
         username: config.get('MYSQL.USERNAME'),
         password: config.get('MYSQL.PASSWORD'),
         database: config.get('MYSQL.DATABASE'),
-        entities: [User, Content, Meta, Option, Relationship],
+        entities: [
+          UserEntity,
+          ContentEntity,
+          MetaEntity,
+          OptionEntity,
+          RelationshipEntity,
+        ],
         synchronize: true,
       }),
     }),

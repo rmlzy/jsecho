@@ -1,46 +1,38 @@
-import {
-  HttpException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { paginate } from 'nestjs-typeorm-paginate';
-import { User } from '../../entities';
+import { UserEntity } from '../../entities';
 import {
   generateHashedPassword,
   isXss,
   getTimestamp,
-  removeEmptyColumns,
   paginateToRes,
-} from '../../utils';
+  BaseService,
+} from '../../common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
-export class UsersService {
-  constructor(@InjectRepository(User) private userRepo: Repository<User>) {}
+export class UsersService extends BaseService<UserEntity> {
+  constructor(
+    @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
+  ) {
+    super(userRepo);
+  }
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto): Promise<void> {
     const { name, mail, password } = createUserDto;
-    if (isXss(name)) {
-      throw new HttpException('请不要在用户名中使用特殊字符', 409);
-    }
-    const nameExisted = await this.userRepo.findOne({ where: { name } });
-    if (nameExisted) {
-      throw new HttpException('用户名已经存在', 409);
-    }
-    const mailExisted = await this.userRepo.findOne({ where: { mail } });
-    if (mailExisted) {
-      throw new HttpException('电子邮箱地址已经存在', 409);
-    }
-    const hashedPassword = await generateHashedPassword(password);
-    const created = await this.userRepo.save({
+    this.asset(isXss(name), '请不要在用户名中使用特殊字符');
+    await this.ensureNotExist({ name }, '用户名已经存在');
+    await this.ensureNotExist({ mail }, '电子邮箱地址已经存在');
+    await this.userRepo.save({
       name,
       mail,
       screenName: name,
-      password: hashedPassword,
+      password: await generateHashedPassword(password),
       created: getTimestamp(),
       group: 'subscriber',
     });
@@ -56,77 +48,68 @@ export class UsersService {
     return paginateToRes(rows);
   }
 
-  async findByUid(uid: number): Promise<User> {
-    const user = await this.userRepo.findOne({ where: { uid } });
+  async findByUid(uid: number): Promise<UserEntity> {
+    const user = await this.ensureExist({ uid });
     return user;
   }
 
-  findByNameOrMail(input: string) {
-    return this.userRepo.findOne({
-      where: [{ name: input }, { mail: input }],
-    });
-  }
-
-  async findByToken(token: string) {
-    if (!token) {
-      throw new UnauthorizedException();
-    }
-    const user = await this.userRepo.findOne({
-      where: { authCode: token },
-    });
-    if (!user) {
-      throw new UnauthorizedException();
-    }
+  async findByNameOrMail(input: string): Promise<UserEntity> {
+    const user = await this.ensureExist([{ name: input }, { mail: input }]);
     return user;
   }
 
-  async update(uid: number, columns) {
-    await this.userRepo.update({ uid }, removeEmptyColumns(columns));
+  async findByToken(token: string): Promise<UserEntity> {
+    this.asset(token, '未检测到认证信息');
+    const user = await this.ensureExist({ authCode: token }, '用户不存在');
+    return user;
   }
 
-  async updateProfile(
-    uid: number,
-    updateProfileDto: UpdateProfileDto,
-  ): Promise<void> {
-    const { screenName, mail, url } = updateProfileDto;
-    const screenNameExisted = await this.userRepo.findOne({
-      where: { screenName },
-    });
-    if (screenNameExisted) {
-      throw new HttpException('昵称已经存在', 409);
-    }
-    const mailExisted = await this.userRepo.findOne({ where: { mail } });
-    if (mailExisted) {
-      throw new HttpException('电子邮箱地址已经存在', 409);
-    }
-    await this.update(uid, { screenName, mail, url });
+  async update(uid: number, dto: UpdateUserDto): Promise<void> {
+    const { screenName, mail } = dto;
+    await this.ensureExist({ uid }, '用户不存在');
+    await this.ensureNotExist({ screenName, uid: Not(uid) }, '昵称已经存在');
+    await this.ensureNotExist({ mail, uid: Not(uid) }, '电子邮箱地址已经存在');
+    await this.userRepo.update({ uid }, dto);
     return null;
   }
 
-  async updatePassword(
-    uid: number,
-    updatePasswordDto: UpdatePasswordDto,
-  ): Promise<void> {
-    const { password, confirm } = updatePasswordDto;
-    if (password !== confirm) {
-      throw new HttpException('两次输入的密码不一致', 409);
-    }
+  async updateProfile(uid: number, dto: UpdateProfileDto): Promise<void> {
+    const { screenName, mail, url } = dto;
+    await this.ensureExist({ uid }, '用户不存在');
+    await this.ensureNotExist({ screenName, uid: Not(uid) }, '昵称已经存在');
+    await this.ensureNotExist({ mail, uid: Not(uid) }, '电子邮箱地址已经存在');
+    await this.userRepo.update({ uid }, { screenName, mail, url });
+    return null;
+  }
+
+  async updatePassword(uid: number, dto: UpdatePasswordDto): Promise<void> {
+    const { password, confirm } = dto;
+    this.asset(password === confirm, '两次输入的密码不一致');
+    await this.ensureExist({ uid }, '用户不存在');
     const hashedPassword = await generateHashedPassword(password);
-    await this.update(uid, { password: hashedPassword });
+    await this.userRepo.update(
+      { uid },
+      { password: hashedPassword, authCode: '' },
+    );
     return null;
   }
 
   async remove(uid: number): Promise<void> {
-    const existed = await this.userRepo.findOne({ uid });
-    if (!existed) {
-      throw new HttpException('资源不存在', 404);
-    }
-    // TODO: 校验当前用户权限
-    const removed = await this.userRepo.delete({ uid });
+    await this.ensureExist({ uid }, '用户不存在');
+    await this.userRepo.delete({ uid });
     return null;
   }
 
-  async removeToken(uid) {
+  async removeToken(uid): Promise<void> {
+    await this.ensureExist({ uid }, '用户不存在');
     await this.userRepo.update({ uid }, { authCode: '' });
+  }
+
+  async setToken(uid: number, token: string): Promise<void> {
+    await this.ensureExist({ uid }, '用户不存在');
+    await this.userRepo.update(
+      { uid },
+      { authCode: token, logged: getTimestamp() },
+    );
   }
 }

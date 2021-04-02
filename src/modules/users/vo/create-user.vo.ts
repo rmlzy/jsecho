@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ResponseVo } from '../../../core';
+import { ResponseVo } from '../../../common';
 
 class UserBaseVo {
   @ApiProperty({ description: 'ID' })

@@ -1,22 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateOptionDto } from './dto/create-option.dto';
-import { UpdateOptionDto } from './dto/update-option.dto';
-import { Option } from '../../entities';
-import { optionsToMap } from '../../utils';
+import { OptionEntity } from '../../entities';
+import { BaseService, optionsToMap } from '../../common';
 
 @Injectable()
-export class OptionsService {
+export class OptionsService extends BaseService<OptionEntity> {
   userId = 1;
 
   constructor(
-    @InjectRepository(Option) private optionRepo: Repository<Option>,
-  ) {}
+    @InjectRepository(OptionEntity)
+    private optionRepo: Repository<OptionEntity>,
+  ) {
+    super(optionRepo);
+  }
 
-  create(createOptionDto: CreateOptionDto) {}
-
-  findAll(): Promise<Option[]> {
+  findAll(): Promise<OptionEntity[]> {
     return this.optionRepo.find();
   }
 
@@ -29,8 +28,4 @@ export class OptionsService {
     const options = await this.optionRepo.find({ where: { user: uid } });
     return optionsToMap(options);
   }
-
-  update(updateOptionDto: UpdateOptionDto) {}
-
-  remove({ name, user }) {}
 }

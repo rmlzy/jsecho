@@ -3,7 +3,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 @Entity({
   name: 'pp_contents',
 })
-export class Content {
+export class ContentEntity {
   @PrimaryGeneratedColumn()
   cid: number;
 

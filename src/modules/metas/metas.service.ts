@@ -1,29 +1,25 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateMetaDto } from './dto/create-meta.dto';
 import { UpdateMetaDto } from './dto/update-meta.dto';
-import { Meta } from '../../entities';
-import { isXss, removeEmptyColumns } from '../../utils';
+import { MetaEntity } from '../../entities';
+import { BaseService, isXss, removeEmptyColumns } from '../../common';
 
 @Injectable()
-export class MetasService {
-  constructor(@InjectRepository(Meta) private metaRepo: Repository<Meta>) {}
+export class MetasService extends BaseService<MetaEntity> {
+  constructor(
+    @InjectRepository(MetaEntity) private metaRepo: Repository<MetaEntity>,
+  ) {
+    super(metaRepo);
+  }
 
   async create(createMetaDto: CreateMetaDto): Promise<void> {
     const { name, slug, parent, description } = createMetaDto;
-    if (isXss(name)) {
-      throw new HttpException('请不要在分类名称中使用特殊字符', 409);
-    }
-    const nameExisted = await this.metaRepo.findOne({ where: { name } });
-    if (nameExisted) {
-      throw new HttpException('分类名称已经存在', 409);
-    }
-    const slugExisted = await this.metaRepo.findOne({ where: { slug } });
-    if (slugExisted) {
-      throw new HttpException('分类缩写名已经存在', 409);
-    }
-    const created = await this.metaRepo.save({
+    this.asset(isXss(name), '请不要在分类名称中使用特殊字符');
+    await this.ensureNotExist({ name }, '分类名称已经存在');
+    await this.ensureNotExist({ slug }, '分类缩写名已经存在');
+    await this.metaRepo.save({
       name,
       slug,
       type: 'category',
@@ -35,18 +31,16 @@ export class MetasService {
     return null;
   }
 
-  findAll(): Promise<Meta[]> {
+  findAll(): Promise<MetaEntity[]> {
     return this.metaRepo.find();
   }
 
-  findById(mid: number) {
-    return this.metaRepo.findOne({ where: { mid } });
+  async findById(mid: number): Promise<MetaEntity> {
+    const meta = await this.ensureExist({ mid }, '分类不存在');
+    return meta;
   }
 
-  /**
-   * 通过分类ID查询, 无则跳过
-   */
-  async findCategoryIds(ids): Promise<Meta[]> {
+  async findCategoryIds(ids): Promise<MetaEntity[]> {
     const metas = [];
     for (let i = 0; i < ids.length; i++) {
       const meta = await this.metaRepo.findOne({
@@ -59,10 +53,7 @@ export class MetasService {
     return metas;
   }
 
-  /**
-   * 通过标签名称查询, 无则创建
-   */
-  async findTagIds(names): Promise<Meta[]> {
+  async findTagIds(names): Promise<MetaEntity[]> {
     const metas = [];
     for (let i = 0; i < names.length; i++) {
       const existed = await this.metaRepo.findOne({
@@ -82,11 +73,8 @@ export class MetasService {
     return metas;
   }
 
-  /**
-   * 通过名称默认创建
-   */
-  private async createTagByName(name): Promise<Meta> {
-    const meta = new Meta();
+  private async createTagByName(name): Promise<MetaEntity> {
+    const meta = new MetaEntity();
     meta.name = name;
     meta.slug = name;
     meta.type = 'tag';
@@ -96,22 +84,15 @@ export class MetasService {
     return created;
   }
 
-  async update(mid: number, updateMetaDto: UpdateMetaDto) {
-    const existed = await this.metaRepo.findOne({ mid });
-    if (!existed) {
-      throw new HttpException('资源不存在', 404);
-    }
+  async update(mid: number, updateMetaDto: UpdateMetaDto): Promise<void> {
+    await this.ensureExist({ mid }, '资源不存在');
     await this.metaRepo.update({ mid }, removeEmptyColumns(updateMetaDto));
     return null;
   }
 
-  async remove(mid: number) {
-    const existed = await this.metaRepo.findOne({ mid });
-    if (!existed) {
-      throw new HttpException('资源不存在', 404);
-    }
-    // TODO: 校验当前用户权限
-    const removed = await this.metaRepo.delete({ mid });
+  async remove(mid: number): Promise<void> {
+    await this.ensureExist({ mid }, '资源不存在');
+    await this.metaRepo.delete({ mid });
     return null;
   }
 }

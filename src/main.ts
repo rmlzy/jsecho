@@ -7,7 +7,7 @@ import * as csurf from 'csurf';
 import { setupSwagger } from './swagger';
 import { AppModule } from './app.module';
 import { ValidationPipe } from './pipes/validation.pipe';
-import { isDevelop } from './utils';
+import { isDevelop } from './common';
 import { HttpExceptionFilter } from './filters';
 
 async function bootstrap() {

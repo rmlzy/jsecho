@@ -3,7 +3,7 @@ import { Column, Entity } from 'typeorm';
 @Entity({
   name: 'pp_options',
 })
-export class Option {
+export class OptionEntity {
   @Column({ length: 32, nullable: false, primary: true })
   name: string;
 

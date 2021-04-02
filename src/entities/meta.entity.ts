@@ -3,7 +3,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 @Entity({
   name: 'pp_metas',
 })
-export class Meta {
+export class MetaEntity {
   @PrimaryGeneratedColumn()
   mid: number;
 
