@@ -6,7 +6,7 @@ import { getTimestamp } from '../utils';
 export class BaseService<T> {
   constructor(private readonly repo: Repository<T>) {}
 
-  getTimestamp(date) {
+  getTimestamp(date?: string) {
     return getTimestamp(date);
   }
 
@@ -36,7 +36,7 @@ export class BaseService<T> {
 
   async ensureExist(where, errorMsg = '资源不存在') {
     const existed = await this.repo.findOne({ where });
-    if (existed) {
+    if (!existed) {
       throw new HttpException(errorMsg, 404);
     }
     return existed;

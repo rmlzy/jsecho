@@ -34,6 +34,6 @@ export class UserEntity {
   @Column({ length: 255, default: 'visitor' })
   group: string;
 
-  @Column({ length: 255, default: '' })
+  @Column({ length: 500, default: '' })
   authCode: string;
 }

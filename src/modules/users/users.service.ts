@@ -3,17 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import { paginate } from 'nestjs-typeorm-paginate';
 import { UserEntity } from '../../entities';
-import {
-  generateHashedPassword,
-  isXss,
-  getTimestamp,
-  paginateToRes,
-  BaseService,
-} from '../../common';
+import { generateHashedPassword, isNotXss, BaseService } from '../../common';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService extends BaseService<UserEntity> {
@@ -25,7 +19,7 @@ export class UsersService extends BaseService<UserEntity> {
 
   async create(createUserDto: CreateUserDto): Promise<void> {
     const { name, mail, password } = createUserDto;
-    this.asset(isXss(name), '请不要在用户名中使用特殊字符');
+    this.asset(isNotXss(name), '请不要在用户名中使用特殊字符');
     await this.ensureNotExist({ name }, '用户名已经存在');
     await this.ensureNotExist({ mail }, '电子邮箱地址已经存在');
     await this.userRepo.save({
@@ -33,7 +27,7 @@ export class UsersService extends BaseService<UserEntity> {
       mail,
       screenName: name,
       password: await generateHashedPassword(password),
-      created: getTimestamp(),
+      created: this.getTimestamp(),
       group: 'subscriber',
     });
     return null;
@@ -45,11 +39,11 @@ export class UsersService extends BaseService<UserEntity> {
       page: pageIndex,
       limit: pageSize,
     });
-    return paginateToRes(rows);
+    return this.parsePaginateRes(rows);
   }
 
   async findByUid(uid: number): Promise<UserEntity> {
-    const user = await this.ensureExist({ uid });
+    const user = await this.ensureExist({ uid }, '用户不存在');
     return user;
   }
 
@@ -69,6 +63,8 @@ export class UsersService extends BaseService<UserEntity> {
     await this.ensureExist({ uid }, '用户不存在');
     await this.ensureNotExist({ screenName, uid: Not(uid) }, '昵称已经存在');
     await this.ensureNotExist({ mail, uid: Not(uid) }, '电子邮箱地址已经存在');
+    dto.password = await generateHashedPassword(dto.password);
+    dto.authCode = '';
     await this.userRepo.update({ uid }, dto);
     return null;
   }
@@ -109,7 +105,7 @@ export class UsersService extends BaseService<UserEntity> {
     await this.ensureExist({ uid }, '用户不存在');
     await this.userRepo.update(
       { uid },
-      { authCode: token, logged: getTimestamp() },
+      { authCode: token, logged: this.getTimestamp() },
     );
   }
 }

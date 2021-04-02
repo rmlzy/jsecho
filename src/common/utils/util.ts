@@ -2,9 +2,10 @@ const xss = require('xss');
 const dayjs = require('dayjs');
 const _ = require('lodash');
 
-export const isXss = (text: string) => {
+export const isNotXss = (text: string) => {
+  // @ts-ignore
   const filtered = xss(text);
-  return filtered !== text;
+  return filtered === text;
 };
 
 export const isDevelop = () => process.env.NODE_ENV === 'development';

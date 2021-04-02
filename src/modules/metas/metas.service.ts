@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { CreateMetaDto } from './dto/create-meta.dto';
 import { UpdateMetaDto } from './dto/update-meta.dto';
 import { MetaEntity } from '../../entities';
-import { BaseService, isXss, removeEmptyColumns } from '../../common';
+import { BaseService, isNotXss, removeEmptyColumns } from '../../common';
 
 @Injectable()
 export class MetasService extends BaseService<MetaEntity> {
@@ -16,7 +16,7 @@ export class MetasService extends BaseService<MetaEntity> {
 
   async create(createMetaDto: CreateMetaDto): Promise<void> {
     const { name, slug, parent, description } = createMetaDto;
-    this.asset(isXss(name), '请不要在分类名称中使用特殊字符');
+    this.asset(isNotXss(name), '请不要在分类名称中使用特殊字符');
     await this.ensureNotExist({ name }, '分类名称已经存在');
     await this.ensureNotExist({ slug }, '分类缩写名已经存在');
     await this.metaRepo.save({
