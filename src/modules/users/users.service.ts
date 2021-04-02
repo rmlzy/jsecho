@@ -6,13 +6,12 @@ import { UserEntity } from '../../entities';
 import { generateHashedPassword, isNotXss, BaseService } from '../../common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UpdateProfileDto } from './dto/update-profile.dto';
-import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UpdateProfileDto, UpdatePasswordDto } from '../../common';
 
 @Injectable()
 export class UsersService extends BaseService<UserEntity> {
   constructor(
-    @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
+    @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>, // private authService: AuthService,
   ) {
     super(userRepo);
   }
@@ -96,14 +95,10 @@ export class UsersService extends BaseService<UserEntity> {
   }
 
   async updatePassword(uid: number, dto: UpdatePasswordDto): Promise<void> {
-    const { password, confirm } = dto;
-    this.asset(password === confirm, '两次输入的密码不一致');
+    const { password } = dto;
     await this.ensureExist({ uid }, '用户不存在');
     const hashedPassword = await generateHashedPassword(password);
-    await this.userRepo.update(
-      { uid },
-      { password: hashedPassword, authCode: '' },
-    );
+    await this.userRepo.update({ uid }, { password: hashedPassword, authCode: '' });
     return null;
   }
 
@@ -120,9 +115,6 @@ export class UsersService extends BaseService<UserEntity> {
 
   async setToken(uid: number, token: string): Promise<void> {
     await this.ensureExist({ uid }, '用户不存在');
-    await this.userRepo.update(
-      { uid },
-      { authCode: token, logged: this.getTimestamp() },
-    );
+    await this.userRepo.update({ uid }, { authCode: token, logged: this.getTimestamp() });
   }
 }

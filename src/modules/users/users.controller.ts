@@ -13,8 +13,6 @@ import {
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateProfileDto } from './dto/update-profile.dto';
-import { UpdatePasswordDto } from './dto/update-password.dto';
 import { LoggedGuard, Roles } from '../../guards';
 import { OptionsService } from '../options/options.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -64,35 +62,8 @@ export class UsersController {
   @ApiOperation({ description: '更新用户信息' })
   @Patch(':uid')
   @Roles(['administrator'])
-  async update(
-    @Param('uid') uid: string,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
+  async update(@Param('uid') uid: string, @Body() updateUserDto: UpdateUserDto) {
     const res = await this.userService.update(+uid, updateUserDto);
-    return { code: HttpStatus.OK, message: 'OK', data: res };
-  }
-
-  @ApiOperation({ description: '更新用户基本信息' })
-  @UseGuards(LoggedGuard)
-  @Roles(['public'])
-  @Patch(':uid/profile')
-  async updateProfile(
-    @Param('uid') uid: string,
-    @Body() updateProfileDto: UpdateProfileDto,
-  ) {
-    const res = await this.userService.updateProfile(+uid, updateProfileDto);
-    return { code: HttpStatus.OK, message: 'OK', data: res };
-  }
-
-  @ApiOperation({ description: '更新用户密码' })
-  @UseGuards(LoggedGuard)
-  @Roles(['public'])
-  @Patch(':uid/password')
-  async updatePassword(
-    @Param('uid') uid: string,
-    @Body() updatePasswordDto: UpdatePasswordDto,
-  ) {
-    const res = await this.userService.updatePassword(+uid, updatePasswordDto);
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 

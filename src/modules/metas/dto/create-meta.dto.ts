@@ -1,10 +1,4 @@
-import {
-  IsEnum,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  MaxLength,
-} from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, MaxLength } from 'class-validator';
 
 export class CreateMetaDto {
   @IsNotEmpty({ message: '必须填写分类名称' })

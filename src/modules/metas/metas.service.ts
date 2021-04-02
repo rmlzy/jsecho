@@ -4,18 +4,11 @@ import { In, Repository } from 'typeorm';
 import { CreateMetaDto } from './dto/create-meta.dto';
 import { UpdateMetaDto } from './dto/update-meta.dto';
 import { MetaEntity } from '../../entities';
-import {
-  BaseService,
-  IPaginateResponse,
-  isNotXss,
-  removeEmptyColumns,
-} from '../../common';
+import { BaseService, IPaginateResponse, isNotXss, removeEmptyColumns } from '../../common';
 
 @Injectable()
 export class MetasService extends BaseService<MetaEntity> {
-  constructor(
-    @InjectRepository(MetaEntity) private metaRepo: Repository<MetaEntity>,
-  ) {
+  constructor(@InjectRepository(MetaEntity) private metaRepo: Repository<MetaEntity>) {
     super(metaRepo);
   }
 
@@ -36,11 +29,7 @@ export class MetasService extends BaseService<MetaEntity> {
     return null;
   }
 
-  async paginate({
-    pageIndex,
-    pageSize,
-    type,
-  }): Promise<IPaginateResponse<MetaEntity>> {
+  async paginate({ pageIndex, pageSize, type }): Promise<IPaginateResponse<MetaEntity>> {
     const [metas, total] = await this.metaRepo.findAndCount({
       where: { type },
       order: { mid: 'DESC' },
@@ -124,10 +113,7 @@ export class MetasService extends BaseService<MetaEntity> {
     return created;
   }
 
-  private async findByMids(
-    mids: number[],
-    type: string,
-  ): Promise<MetaEntity[]> {
+  private async findByMids(mids: number[], type: string): Promise<MetaEntity[]> {
     const metas = await this.metaRepo.find({
       where: { mid: In(mids), type },
       select: ['mid', 'name', 'slug', 'type'],

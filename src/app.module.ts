@@ -1,10 +1,5 @@
 import { APP_INTERCEPTOR, APP_GUARD } from '@nestjs/core';
-import {
-  CacheInterceptor,
-  CacheModule,
-  HttpModule,
-  Module,
-} from '@nestjs/common';
+import { CacheInterceptor, CacheModule, HttpModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
@@ -49,13 +44,7 @@ import {
         username: config.get('MYSQL.USERNAME'),
         password: config.get('MYSQL.PASSWORD'),
         database: config.get('MYSQL.DATABASE'),
-        entities: [
-          UserEntity,
-          ContentEntity,
-          MetaEntity,
-          OptionEntity,
-          RelationshipEntity,
-        ],
+        entities: [UserEntity, ContentEntity, MetaEntity, OptionEntity, RelationshipEntity],
         synchronize: true,
       }),
     }),

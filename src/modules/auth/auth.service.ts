@@ -13,10 +13,7 @@ import {
 
 @Injectable()
 export class AuthService extends BaseService<any> {
-  constructor(
-    private userService: UsersService,
-    private jwtService: JwtService,
-  ) {
+  constructor(private userService: UsersService, private jwtService: JwtService) {
     super(null);
   }
 

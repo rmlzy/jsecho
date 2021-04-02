@@ -1,10 +1,4 @@
-import {
-  IsEnum,
-  IsNotEmpty,
-  IsOptional,
-  IsArray,
-  MaxLength,
-} from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsArray, MaxLength } from 'class-validator';
 
 export class CreateContentDto {
   @IsNotEmpty({ message: '必须填写文章标题' })

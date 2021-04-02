@@ -46,10 +46,7 @@ export class ContentsController {
   @UseGuards(LoggedGuard)
   @Roles(['administrator', 'editor', 'contributor'])
   @Patch(':cid')
-  async update(
-    @Param('cid') cid: string,
-    @Body() updateContentDto: UpdateContentDto,
-  ) {
+  async update(@Param('cid') cid: string, @Body() updateContentDto: UpdateContentDto) {
     const res = await this.contentsService.update(+cid, updateContentDto);
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }

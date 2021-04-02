@@ -6,10 +6,7 @@ import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    private configService: ConfigService,
-    private userService: UsersService,
-  ) {
+  constructor(private configService: ConfigService, private userService: UsersService) {
     super({
       jwtFromRequest: ExtractJwt.fromHeader('token'),
       secretOrKey: configService.get('JWT_SECRET_KEY'),

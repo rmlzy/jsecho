@@ -52,10 +52,7 @@ export class MetasController {
   @UseGuards(LoggedGuard)
   @Roles(['administrator'])
   @Patch(':mid')
-  async update(
-    @Param('mid') mid: string,
-    @Body() updateMetaDto: UpdateMetaDto,
-  ) {
+  async update(@Param('mid') mid: string, @Body() updateMetaDto: UpdateMetaDto) {
     const res = await this.metaService.update(+mid, updateMetaDto);
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
