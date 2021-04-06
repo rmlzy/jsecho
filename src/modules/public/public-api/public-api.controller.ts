@@ -12,7 +12,6 @@ export class PublicApiController {
   constructor(private authService: AuthService, private userService: UsersService) {}
 
   @ApiOperation({ description: '登录' })
-  @Roles(['public'])
   @Post('/login')
   async login(@Body() dto: LoginDto) {
     const res = await this.authService.login(dto);
@@ -20,7 +19,6 @@ export class PublicApiController {
   }
 
   @ApiOperation({ description: '登出' })
-  @Roles(['public'])
   @Get('/logout')
   async logout(@Headers('token') token) {
     const res = await this.authService.logout(token);
@@ -28,7 +26,6 @@ export class PublicApiController {
   }
 
   @ApiOperation({ description: '通过token查询用户' })
-  @Roles(['public'])
   @Get('profile')
   async findByToken(@Headers('token') token: string) {
     const res = await this.userService.findByToken(token);
@@ -37,7 +34,6 @@ export class PublicApiController {
 
   @ApiOperation({ description: '更新用户基本信息' })
   @UseGuards(LoggedGuard)
-  @Roles(['public'])
   @Patch('updateProfile')
   async updateProfile(@Headers('token') token, @Body() dto: UpdateProfileDto) {
     const { uid } = this.authService.decodeToken(token);
@@ -47,7 +43,6 @@ export class PublicApiController {
 
   @ApiOperation({ description: '更新用户密码' })
   @UseGuards(LoggedGuard)
-  @Roles(['public'])
   @Patch('updatePassword')
   async updatePassword(@Headers('token') token, @Body() dto: UpdatePasswordDto) {
     const { uid } = this.authService.decodeToken(token);
