@@ -17,6 +17,7 @@ import {
   MetasModule,
   ContentsModule,
   RelationshipsModule,
+  PublicModule,
 } from './modules';
 
 // Entities
@@ -42,8 +43,8 @@ import {
         host: config.get('MYSQL.HOST'),
         port: config.get('MYSQL.PORT'),
         username: config.get('MYSQL.USERNAME'),
-        password: config.get('MYSQL.PASSWORD'),
-        database: config.get('MYSQL.DATABASE'),
+        password: config.get('MYSQL.PASSWORD') as string,
+        database: config.get('MYSQL.DATABASE') as string,
         entities: [UserEntity, ContentEntity, MetaEntity, OptionEntity, RelationshipEntity],
         synchronize: true,
       }),
@@ -70,6 +71,7 @@ import {
     MetasModule,
     ContentsModule,
     RelationshipsModule,
+    PublicModule,
   ],
   controllers: [AppController],
   providers: [

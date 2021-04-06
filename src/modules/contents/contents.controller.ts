@@ -14,11 +14,14 @@ import { ContentsService } from './contents.service';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
 import { LoggedGuard, Roles } from '../../guards';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('文章')
 @Controller('contents')
 export class ContentsController {
   constructor(private readonly contentsService: ContentsService) {}
 
+  @ApiOperation({ description: '创建文章' })
   @UseGuards(LoggedGuard)
   @Roles(['administrator', 'editor', 'contributor'])
   @Post()
@@ -27,6 +30,7 @@ export class ContentsController {
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
+  @ApiOperation({ description: '获取文章分页列表' })
   @UseGuards(LoggedGuard)
   @Roles(['administrator', 'editor', 'contributor'])
   @Get()
@@ -35,6 +39,7 @@ export class ContentsController {
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
+  @ApiOperation({ description: '获取文章' })
   @UseGuards(LoggedGuard)
   @Roles(['administrator', 'editor', 'contributor'])
   @Get(':cid')
@@ -43,6 +48,7 @@ export class ContentsController {
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
+  @ApiOperation({ description: '更新文章' })
   @UseGuards(LoggedGuard)
   @Roles(['administrator', 'editor', 'contributor'])
   @Patch(':cid')
@@ -51,6 +57,7 @@ export class ContentsController {
     return { code: HttpStatus.OK, message: 'OK', data: res };
   }
 
+  @ApiOperation({ description: '删除文章' })
   @UseGuards(LoggedGuard)
   @Roles(['administrator', 'editor', 'contributor'])
   @Delete(':cid')

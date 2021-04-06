@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Not, Repository } from 'typeorm';
 import { uniq } from 'lodash';
@@ -69,7 +69,9 @@ export class UsersService extends BaseService<UserEntity> {
   }
 
   async findByToken(token: string): Promise<UserEntity> {
-    this.asset(token, '未检测到认证信息');
+    if (!token) {
+      throw new HttpException('未检测到认证信息', 401);
+    }
     const user = await this.ensureExist({ authCode: token }, '用户不存在');
     return user;
   }

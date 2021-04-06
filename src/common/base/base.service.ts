@@ -10,17 +10,6 @@ export class BaseService<T> {
     return getTimestamp(date);
   }
 
-  parsePaginateRes(pageRes) {
-    const { items, meta } = pageRes;
-    const { currentPage, itemsPerPage, totalItems } = meta;
-    return {
-      items,
-      total: totalItems,
-      pageIndex: currentPage,
-      pageSize: itemsPerPage,
-    };
-  }
-
   asset(condition, errorMsg = '参数错误') {
     if (!condition) {
       throw new HttpException(errorMsg, 409);

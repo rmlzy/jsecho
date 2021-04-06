@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as compression from 'compression';
 import * as helmet from 'helmet';
+import * as favicon from 'serve-favicon';
 import * as csurf from 'csurf';
 import { setupSwagger } from './swagger';
 import { AppModule } from './app.module';
@@ -20,6 +21,7 @@ async function bootstrap() {
   app.useStaticAssets(resolve('./src/public'), {
     prefix: '/public/',
   });
+  app.use(favicon(resolve('./src/public/img/favicon.png')));
 
   app.setBaseViewsDir(resolve('./src/views'));
   app.setViewEngine('hbs');
@@ -31,7 +33,7 @@ async function bootstrap() {
 
   const port = app.get('ConfigService').get('SERVER_PORT');
   await app.listen(port);
-  console.log(`Server started at ${port}!`);
+  console.log(`Server started at http://localhost:${port}!`);
 }
 
 bootstrap();

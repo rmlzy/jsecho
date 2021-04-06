@@ -15,5 +15,7 @@ export const setupSwagger = (app: INestApplication) => {
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, options);
-  SwaggerModule.setup(SWAGGER_API_ROOT, app, document);
+  SwaggerModule.setup(SWAGGER_API_ROOT, app, document, {
+    customfavIcon: './public/favicon.png',
+  });
 };
