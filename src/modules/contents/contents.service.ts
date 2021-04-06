@@ -127,11 +127,29 @@ export class ContentsService extends BaseService<ContentEntity> {
     return null;
   }
 
+  async findPosts({ pageIndex, pageSize }) {
+    const [posts, total] = await this.contentRepo.findAndCount({
+      where: { type: 'post' },
+      order: { cid: 'DESC' },
+      select: ['cid', 'slug', 'title', 'text', 'created', 'modified'],
+      take: pageSize,
+      skip: (pageIndex - 1) * pageSize,
+    });
+    return { posts, total };
+  }
+
   async findPages() {
-    const res = await this.contentRepo.find({
+    const pages = await this.contentRepo.find({
       where: { type: 'page' },
       select: ['cid', 'slug', 'title'],
     });
-    return res;
+    return pages;
+  }
+
+  async findByIdOrSlug(input) {
+    const content = await this.contentRepo.findOne({
+      where: [{ cid: input }, { slug: input }],
+    });
+    return content;
   }
 }

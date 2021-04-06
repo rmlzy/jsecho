@@ -2,40 +2,63 @@ import { Injectable, Scope } from '@nestjs/common';
 import * as dayjs from 'dayjs';
 import { OptionsService } from '../../options/options.service';
 import { ContentsService } from '../../contents/contents.service';
-import { getExcerpt, IOptions } from '../../../common';
+import { getExcerpt, IOptions, md2html } from '../../../common';
 import { IPaginate, IContent } from './public-view.interface';
 
 @Injectable({ scope: Scope.REQUEST })
 export class PublicViewService {
-  options: IOptions = {};
+  options: IOptions = null;
+  pages = null;
 
-  constructor(private optionService: OptionsService, private contentService: ContentsService) {
-    this.optionService.findDefault().then((options) => {
-      this.options = options;
-    });
+  constructor(private optionService: OptionsService, private contentService: ContentsService) {}
+
+  async findSiteConfig() {
+    if (this.options) {
+      return this.options;
+    }
+    const options = await this.optionService.findDefault();
+    this.options = options;
+    return options;
   }
 
-  async paginatePostsByPageIndex(pageIndex): Promise<IPaginate<IContent>> {
-    const { pageSize, postDateFormat } = this.options;
-    const res = await this.contentService.paginate({ pageIndex, pageSize: +pageSize });
-    const posts = res.items.map((content) => {
-      const { title, slug, text, authorId, authorName, categories, tags } = content;
-      return {
-        title,
-        slug,
-        excerpt: getExcerpt(text),
-        authorId,
-        authorName,
-        categories,
-        tags,
-        createdAt: dayjs(content.created * 1000).format(postDateFormat || 'YYYY-MM-DD'),
-        modifiedAt: dayjs(content.modified * 1000).format(postDateFormat || 'YYYY-MM-DD'),
-      };
+  async findPages() {
+    if (this.pages) {
+      return this.pages;
+    }
+    const pages = await this.contentService.findPages();
+    this.pages = pages;
+    return pages;
+  }
+
+  async findPosts(pageIndex): Promise<IPaginate<IContent>> {
+    const { pageSize, postDateFormat } = await this.findSiteConfig();
+    const format = (timestamp) => dayjs(timestamp).format(postDateFormat || 'YYYY-MM-DD');
+    const { posts, total } = await this.contentService.findPosts({
+      pageIndex,
+      pageSize: +pageSize,
     });
     return {
-      maxPage: 10,
-      pageIndex,
-      posts,
+      hasPrevPage: true,
+      hasNextPage: true,
+      posts: posts.map((post) => {
+        const { cid, title, slug, text, created, modified } = post;
+        return {
+          cid,
+          title,
+          slug,
+          excerpt: getExcerpt(text),
+          createdAt: format(created),
+          modifiedAt: format(modified),
+        };
+      }),
     };
+  }
+
+  async findBlog(input) {
+    const blog = await this.contentService.findByIdOrSlug(input);
+    if (blog) {
+      blog['html'] = md2html(blog.text);
+    }
+    return blog;
   }
 }

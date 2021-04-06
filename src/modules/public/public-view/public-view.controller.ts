@@ -1,54 +1,78 @@
-import { Controller, Get, Param, Res } from '@nestjs/common';
+import { Controller, Get, Param, Res, CacheTTL } from '@nestjs/common';
 import { Response } from 'express';
-import { OptionsService } from '../../options/options.service';
-import { ContentsService } from '../../contents/contents.service';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
 import { PublicViewService } from './public-view.service';
-import { IOptions } from '../../../common';
+import { ONE_HOUR } from '../../../common';
 
 @Controller('')
 export class PublicViewController {
   theme = '';
-  options: IOptions = {};
   sharedVars = {};
 
-  constructor(
-    private optionService: OptionsService,
-    private contentService: ContentsService,
-    private viewService: PublicViewService,
-  ) {
-    this.setSharedVars();
-  }
+  constructor(private viewService: PublicViewService) {}
 
-  async setSharedVars() {
-    const options = await this.optionService.findDefault();
-    const pages = await this.contentService.findPages();
+  private async ensureSharedVars() {
+    if (this.theme) return;
+    const siteConfig = await this.viewService.findSiteConfig();
+    const pages = await this.viewService.findPages();
     this.theme = 'default';
     this.sharedVars = {
-      ...options,
-      ...pages,
+      ...siteConfig,
       layout: `${this.theme}/layout`,
+      pages,
     };
   }
 
+  @ApiExcludeEndpoint()
+  @CacheTTL(ONE_HOUR) // TODO: 似乎不工作
   @Get()
   async home(@Res() res: Response) {
+    await this.ensureSharedVars();
     const pageIndex = 1;
-    const posts = await this.viewService.paginatePostsByPageIndex(pageIndex);
-    res.render(this.theme, {
+    const { posts, hasPrevPage, hasNextPage } = await this.viewService.findPosts(pageIndex);
+    res.render(`${this.theme}/index`, {
       ...this.sharedVars,
-      ...posts,
+      hasNextPage,
+      hasPrevPage,
+      posts,
     });
   }
 
-  @Get('page/:pageIndex')
-  async page(@Param('pageIndex') pageIndex, @Res() res: Response) {
-    const posts = await this.viewService.paginatePostsByPageIndex(+pageIndex);
-    return res.render(this.theme, {
+  @ApiExcludeEndpoint()
+  @CacheTTL(ONE_HOUR)
+  @Get('page/:pageIndex.html')
+  async blogList(@Param('pageIndex') pageIndex, @Res() res: Response) {
+    await this.ensureSharedVars();
+    const { posts, hasPrevPage, hasNextPage } = await this.viewService.findPosts(+pageIndex);
+    return res.render(`${this.theme}/index`, {
       ...this.sharedVars,
-      ...posts,
+      hasNextPage,
+      hasPrevPage,
+      posts,
     });
   }
 
-  @Get('blog/:flag')
-  async blog(@Param('flag') flag, @Res() res: Response) {}
+  @ApiExcludeEndpoint()
+  @CacheTTL(ONE_HOUR)
+  @Get('blog/:input.html')
+  async blog(@Param('input') input, @Res() res: Response) {
+    await this.ensureSharedVars();
+    const blog = await this.viewService.findBlog(input);
+    return res.render(`${this.theme}/post`, {
+      ...this.sharedVars,
+      blog,
+    });
+  }
+
+  @ApiExcludeEndpoint()
+  @CacheTTL(ONE_HOUR)
+  @Get(':input.html')
+  async singlePage(@Param('input') input, @Res() res: Response) {
+    await this.ensureSharedVars();
+    const page = await this.viewService.findBlog(input);
+    return res.render(`${this.theme}/page`, {
+      ...this.sharedVars,
+      page,
+    });
+  }
 }
