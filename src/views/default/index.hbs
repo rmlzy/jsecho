@@ -2,9 +2,9 @@
   <article class='article'>
     <h2 class='article__title'>
       {{#if slug}}
-        <a href="/blog/{{slug}}.html" title='{{title}}'>{{title}}</a>
+        <a href="/post/{{slug}}.html" title='{{title}}'>{{title}}</a>
       {{else}}
-        <a href="/blog/{{cid}}.html" title='{{title}}'>{{title}}</a>
+        <a href="/post/{{cid}}.html" title='{{title}}'>{{title}}</a>
       {{/if}}
     </h2>
 
@@ -16,9 +16,9 @@
 
     <p class='article__more'>
       {{#if slug}}
-        <a href="/blog/{{slug}}.html" title='{{title}}'>- 阅读全文 -</a>
+        <a href="/post/{{slug}}.html" title='{{title}}'>- 阅读全文 -</a>
       {{else}}
-        <a href="/blog/{{cid}}.html" title='{{title}}'>- 阅读全文 -</a>
+        <a href="/post/{{cid}}.html" title='{{title}}'>- 阅读全文 -</a>
       {{/if}}
     </p>
   </article>

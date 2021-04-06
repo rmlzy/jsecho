@@ -54,13 +54,13 @@ export class PublicViewController {
 
   @ApiExcludeEndpoint()
   @CacheTTL(ONE_HOUR)
-  @Get('blog/:input.html')
+  @Get('post/:input.html')
   async blog(@Param('input') input, @Res() res: Response) {
     await this.ensureSharedVars();
-    const blog = await this.viewService.findBlog(input);
+    const post = await this.viewService.findBlog(input);
     return res.render(`${this.theme}/post`, {
       ...this.sharedVars,
-      blog,
+      post,
     });
   }
 
