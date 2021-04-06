@@ -18,10 +18,9 @@ async function bootstrap() {
   app.use(helmet());
   // app.use(csurf({ cookie: true }));
   app.useGlobalFilters(new HttpExceptionFilter());
-  app.useStaticAssets(resolve('./src/public'), {
+  app.useStaticAssets(resolve('./src/views'), {
     prefix: '/public/',
   });
-  app.use(favicon(resolve('./src/public/img/favicon.png')));
 
   app.setBaseViewsDir(resolve('./src/views'));
   app.setViewEngine('hbs');

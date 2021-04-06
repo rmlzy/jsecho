@@ -1,18 +1,25 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>jsecho</title>
-  <link rel="icon" type="image/png" href='/public/img/favicon.png'>
-  <link href='/public/css/main.css' rel="stylesheet">
-</head>
-<body>
+{{#each posts}}
+  <article class='article'>
+    <h2 class='article__title'>
+      {{#if slug}}
+        <a href="/blog/{{slug}}.html" title='{{title}}'>{{title}}</a>
+      {{else}}
+        <a href="/blog/{{cid}}.html" title='{{title}}'>{{title}}</a>
+      {{/if}}
+    </h2>
 
-<div class='demo'>
-  <h3>jsecho</h3>
-  <p>{{ message }}</p>
-</div>
-</body>
-</html>
+    <p>
+      <small>{{authorName}}&nbsp;•&nbsp;{{createdAt}}</small>
+    </p>
 
+    <p>{{{excerpt}}}</p>
+
+    <p class='article__more'>
+      {{#if slug}}
+        <a href="/blog/{{slug}}.html" title='{{title}}'>- 阅读全文 -</a>
+      {{else}}
+        <a href="/blog/{{cid}}.html" title='{{title}}'>- 阅读全文 -</a>
+      {{/if}}
+    </p>
+  </article>
+{{/each}}

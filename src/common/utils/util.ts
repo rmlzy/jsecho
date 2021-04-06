@@ -1,6 +1,31 @@
 const xss = require('xss');
 const dayjs = require('dayjs');
 const _ = require('lodash');
+const MarkdownIt = require('markdown-it');
+import * as hljs from 'highlight.js';
+const pkg = require('../../../package.json');
+
+const md = MarkdownIt({
+  html: true,
+  linkify: true,
+  typographer: true,
+  highlight: function (str, lang) {
+    if (lang && hljs.getLanguage(lang)) {
+      try {
+        return hljs.highlight(str, { language: lang }).value;
+      } catch (__) {}
+    }
+    return '';
+  },
+});
+
+export const md2html = (markdown) => {
+  return md.render(markdown);
+};
+
+export const getVersion = () => {
+  return `${pkg.name} ${pkg.version}/${pkg.publishAt}`;
+};
 
 export const isNotXss = (text: string) => {
   // @ts-ignore
@@ -36,18 +61,11 @@ export const optionsToMap = (options) => {
   return output;
 };
 
-export const paginateToRes = (pageRes) => {
-  const { items, meta } = pageRes;
-  const { currentPage, itemsPerPage, totalItems } = meta;
-  return {
-    items,
-    total: totalItems,
-    pageIndex: currentPage,
-    pageSize: itemsPerPage,
-  };
-};
-
-export const queryToPaginate = (query) => {
-  const { pageIndex, pageSize, ...rest } = query;
-  return { page: pageIndex, limit: pageSize, ...rest };
+export const getExcerpt = (text) => {
+  let subIndex = text.indexOf('<!--more-->');
+  if (subIndex === -1) {
+    subIndex = text.indexOf('<!-- more -->');
+  }
+  const excerpt = text.substring(0, subIndex);
+  return md2html(excerpt);
 };

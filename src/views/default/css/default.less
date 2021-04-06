@@ -1,0 +1,42 @@
+@import '_base';
+@import '_github';
+
+.header,
+.aside,
+.main,
+.footer {
+  max-width: 870px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.header {
+  &__logo {
+    border: none;
+    margin: 0;
+    font-weight: 400;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, Helvetica, STKaiti, SimSun, serif;
+  }
+}
+
+.aside {
+  ul {
+    list-style: none;
+    padding: 0;
+
+    li {
+      padding: 0;
+      display: inline-block;
+      margin-right: 10px;
+    }
+  }
+}
+
+.article {
+  &__title {
+    a {
+      color: #444;
+      text-decoration: none;
+    }
+  }
+}

@@ -2,13 +2,19 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Not, Repository } from 'typeorm';
 import { keyBy } from 'lodash';
-import { BaseService } from '../../common';
+import { BaseService, ICategory, IPaginate } from '../../common';
 import { ContentEntity, RelationshipEntity } from '../../entities';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
 import { MetasService } from '../metas/metas.service';
 import { RelationshipsService } from '../relationships/relationships.service';
 import { UsersService } from '../users/users.service';
+
+export interface IContent extends ContentEntity {
+  authorName: string;
+  tags: string[];
+  categories: ICategory[];
+}
 
 @Injectable()
 export class ContentsService extends BaseService<ContentEntity> {
@@ -56,8 +62,11 @@ export class ContentsService extends BaseService<ContentEntity> {
     return null;
   }
 
-  async paginate({ pageIndex, pageSize }) {
+  async paginate(options): Promise<IPaginate<IContent>> {
+    const pageIndex: number = options.pageIndex;
+    const pageSize: number = options.pageSize;
     const [contents, total] = await this.contentRepo.findAndCount({
+      where: { type: Not('page') },
       order: { modified: 'DESC' },
       take: pageSize,
       skip: (pageIndex - 1) * pageSize,
@@ -70,7 +79,7 @@ export class ContentsService extends BaseService<ContentEntity> {
       const categories = categoryMap[content.cid];
       content['authorName'] = authors[content.authorId]?.screenName || '';
       content['categories'] = categories || [];
-      return content;
+      return content as IContent;
     });
     return {
       items,
@@ -116,5 +125,13 @@ export class ContentsService extends BaseService<ContentEntity> {
     }
     // 事务结束
     return null;
+  }
+
+  async findPages() {
+    const res = await this.contentRepo.find({
+      where: { type: 'page' },
+      select: ['cid', 'slug', 'title'],
+    });
+    return res;
   }
 }

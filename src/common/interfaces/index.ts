@@ -6,9 +6,29 @@ export interface IJwtPayload {
   group: IGroup;
 }
 
-export interface IPaginateResponse<T> {
-  items: T[];
-  total: number;
+export interface IResponse<T> {
+  code: number;
+  message: string;
+  data: T;
+}
+
+export interface IPaginate<T> {
   pageIndex: number;
   pageSize: number;
+  total: number;
+  items: T[];
 }
+
+export interface IOptions {
+  theme?: string;
+  layout?: string;
+  title?: string;
+  description?: string;
+  keywords?: string;
+  charset?: string;
+  generator?: string;
+  pageSize?: string;
+  postDateFormat?: string;
+}
+
+export interface ICategory {}
