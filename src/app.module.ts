@@ -10,24 +10,20 @@ import { RoleGuard } from './guards';
 import { TaskService } from './schedules/task/task.service';
 
 // Modules
-import {
-  UsersModule,
-  AuthModule,
-  OptionsModule,
-  MetasModule,
-  ContentsModule,
-  RelationshipsModule,
-  PublicModule,
-} from './modules';
+import { AuthModule } from './modules/auth/auth.module';
+import { ContentsModule } from './modules/contents/contents.module';
+import { MetasModule } from './modules/metas/metas.module';
+import { OptionsModule } from './modules/options/options.module';
+import { PublicModule } from './modules/public/public.module';
+import { RelationshipsModule } from './modules/relationships/relationships.module';
+import { UsersModule } from './modules/users/users.module';
 
 // Entities
-import {
-  UserEntity,
-  ContentEntity,
-  MetaEntity,
-  OptionEntity,
-  RelationshipEntity,
-} from './entities';
+import { ContentEntity } from './modules/contents/entity/content.entity';
+import { MetaEntity } from './modules/metas/entity/meta.entity';
+import { OptionEntity } from './modules/options/entity/option.entity';
+import { RelationshipEntity } from './modules/relationships/entity/relationship.entity';
+import { UserEntity } from './modules/users/entity/user.entity';
 
 @Module({
   imports: [

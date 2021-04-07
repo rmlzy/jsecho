@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
+import { keyBy } from 'lodash';
+import { BaseService, IPaginate } from '../../base';
+import { isNotXss, removeEmptyColumns } from '../../utils';
+import { IMetaType } from './interface/meta.interface';
+import { MetaEntity } from './entity/meta.entity';
 import { CreateMetaDto } from './dto/create-meta.dto';
 import { UpdateMetaDto } from './dto/update-meta.dto';
-import { MetaEntity } from '../../entities';
-import { BaseService, IPaginate, isNotXss, removeEmptyColumns } from '../../common';
+import { MetaMapVo } from './vo/meta.vo';
 
 @Injectable()
 export class MetasService extends BaseService<MetaEntity> {
@@ -49,12 +53,12 @@ export class MetasService extends BaseService<MetaEntity> {
     return meta;
   }
 
-  async findCategoriesByMids(mids: number[]): Promise<MetaEntity[]> {
-    return this.findByMids(mids, 'category');
-  }
-
-  async findTagsByMids(mids: number[]): Promise<MetaEntity[]> {
-    return this.findByMids(mids, 'tag');
+  async findMetaMapByMids(mids: number[], type: IMetaType): Promise<MetaMapVo> {
+    const metas = await this.metaRepo.find({
+      where: { mid: In(mids), type },
+      select: ['mid', 'name', 'slug'],
+    });
+    return keyBy(metas, 'mid');
   }
 
   async findCategoryIds(ids): Promise<MetaEntity[]> {
@@ -111,13 +115,5 @@ export class MetasService extends BaseService<MetaEntity> {
     meta.count = 1;
     const created = await this.metaRepo.save(meta);
     return created;
-  }
-
-  private async findByMids(mids: number[], type: string): Promise<MetaEntity[]> {
-    const metas = await this.metaRepo.find({
-      where: { mid: In(mids), type },
-      select: ['mid', 'name', 'slug', 'type'],
-    });
-    return metas;
   }
 }

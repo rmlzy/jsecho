@@ -1,15 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { BaseService } from '../../base';
+import { verifyUserPassword, sleep } from '../../utils';
+import { ALLOW_LOGIN_GROUPS } from '../../constants';
 import { UsersService } from '../users/users.service';
+import { IUserGroup } from '../users/interface/user.interface';
 import { LoginDto } from './dto/login.dto';
-import {
-  verifyUserPassword,
-  sleep,
-  BaseService,
-  IGroup,
-  IJwtPayload,
-  ALLOW_LOGIN_GROUPS,
-} from '../../common';
+import { IJwtPayload } from './interface/auth.interface';
 
 @Injectable()
 export class AuthService extends BaseService<any> {
@@ -37,7 +34,7 @@ export class AuthService extends BaseService<any> {
     const payload: IJwtPayload = {
       name,
       uid: user.uid,
-      group: user.group as IGroup,
+      group: user.group as IUserGroup,
     };
     const token = this.jwtService.sign(payload, {
       expiresIn: '1d',

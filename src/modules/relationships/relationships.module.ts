@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { RelationshipsService } from './relationships.service';
-import { RelationshipEntity } from '../../entities';
 import { MetasModule } from '../metas/metas.module';
+import { RelationshipEntity } from './entity/relationship.entity';
+import { RelationshipsService } from './relationships.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([RelationshipEntity]), MetasModule],

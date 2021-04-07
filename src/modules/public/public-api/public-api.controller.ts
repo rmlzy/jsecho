@@ -1,10 +1,11 @@
 import { Body, Controller, Get, Headers, HttpStatus, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AuthService } from '../../auth/auth.service';
+import { LoggedGuard } from '../../../guards';
 import { UsersService } from '../../users/users.service';
-import { LoggedGuard, Roles } from '../../../guards';
+import { AuthService } from '../../auth/auth.service';
 import { LoginDto } from '../../auth/dto/login.dto';
-import { UpdatePasswordDto, UpdateProfileDto } from '../../../common';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @ApiTags('公开API')
 @Controller('')

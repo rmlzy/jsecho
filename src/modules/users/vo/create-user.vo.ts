@@ -1,26 +1,8 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { ResponseVo } from '../../../common';
-
-class UserBaseVo {
-  @ApiProperty({ description: 'ID' })
-  uid: string;
-
-  @ApiProperty({ description: '用户名' })
-  name: string;
-
-  @ApiProperty({ description: '昵称' })
+export interface UserVo {
+  uid: number;
   screenName: string;
-
-  @ApiProperty({ description: '邮箱' })
-  mail: string;
 }
 
-export class CreateUserVo extends ResponseVo<UserBaseVo> {
-  @ApiProperty()
-  data: UserBaseVo;
-}
-
-export class GetUserVo extends ResponseVo<UserBaseVo> {
-  @ApiProperty()
-  data: UserBaseVo;
+export interface UserMapVo {
+  [key: number]: UserVo;
 }

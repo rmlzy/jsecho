@@ -3,7 +3,7 @@ const dayjs = require('dayjs');
 const _ = require('lodash');
 const MarkdownIt = require('markdown-it');
 import * as hljs from 'highlight.js';
-const pkg = require('../../../package.json');
+const pkg = require('../../package.json');
 
 const md = MarkdownIt({
   html: true,
@@ -61,7 +61,7 @@ export const optionsToMap = (options) => {
   return output;
 };
 
-export const getExcerpt = (text) => {
+export const getExcerpt = (text: string): string => {
   let subIndex = text.indexOf('<!--more-->');
   if (subIndex === -1) {
     subIndex = text.indexOf('<!-- more -->');

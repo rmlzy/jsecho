@@ -1,9 +1,11 @@
 <article class='article'>
-  <div class='article__title'>{{post.title}}</div>
-
-  <p>
-    <small>{{authorName}}&nbsp;•&nbsp;{{createdAt}}</small>
-  </p>
+  <h1 class='article__title'>{{post.title}}</h1>
+  <div class='article__tags'>
+    {{#each post.tags}}
+      <a class='tag' href='/tag/{{slug}}.html'>{{name}}</a>
+    {{/each}}
+  </div>
+  <div class='article__meta'>{{post.authorName}}&nbsp;•&nbsp;{{post.createdAt}}</div>
 
   {{{post.html}}}
 </article>

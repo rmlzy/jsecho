@@ -1,20 +1,19 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Not, Repository } from 'typeorm';
-import { keyBy } from 'lodash';
-import { BaseService, ICategory, IPaginate } from '../../common';
-import { ContentEntity, RelationshipEntity } from '../../entities';
+import * as dayjs from 'dayjs';
+import { getExcerpt, md2html } from '../../utils';
+import { BaseService, IPaginate } from '../../base';
+import { MetasService } from '../metas/metas.service';
+import { UsersService } from '../users/users.service';
+import { OptionsService } from '../options/options.service';
+import { RelationshipsService } from '../relationships/relationships.service';
+import { RelationshipEntity } from '../relationships/entity/relationship.entity';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
-import { MetasService } from '../metas/metas.service';
-import { RelationshipsService } from '../relationships/relationships.service';
-import { UsersService } from '../users/users.service';
-
-export interface IContent extends ContentEntity {
-  authorName: string;
-  tags: string[];
-  categories: ICategory[];
-}
+import { ContentPageVo, ContentVo } from './vo/content.vo';
+import { IContentPage } from './interface/content.interface';
+import { ContentEntity } from './entity/content.entity';
 
 @Injectable()
 export class ContentsService extends BaseService<ContentEntity> {
@@ -24,6 +23,7 @@ export class ContentsService extends BaseService<ContentEntity> {
     private relationService: RelationshipsService,
     private metaService: MetasService,
     private userService: UsersService,
+    private optionService: OptionsService,
     private connection: Connection,
   ) {
     super(contentRepo);
@@ -62,40 +62,37 @@ export class ContentsService extends BaseService<ContentEntity> {
     return null;
   }
 
-  async paginate(options): Promise<IPaginate<IContent>> {
-    const pageIndex: number = options.pageIndex;
-    const pageSize: number = options.pageSize;
+  async paginate({ pageIndex, pageSize }): Promise<IPaginate<ContentPageVo>> {
+    const { postDateFormat } = await this.optionService.findSiteConfig();
+    const format = (timestamp) => dayjs(timestamp).format(postDateFormat || 'YYYY-MM-DD');
     const [contents, total] = await this.contentRepo.findAndCount({
-      where: { type: Not('page') },
+      where: { type: 'post' },
       order: { modified: 'DESC' },
       take: pageSize,
       skip: (pageIndex - 1) * pageSize,
+      select: ['cid', 'slug', 'title', 'text', 'authorId', 'created', 'modified'],
     });
     const cids = contents.map((content) => content.cid);
-    const authorIds = contents.map((content) => content.authorId);
-    const authors = keyBy(await this.userService.findByUids(authorIds), 'uid');
-    const categoryMap = await this.relationService.findCategoriesByCids(cids);
-    const items = contents.map((content) => {
-      const categories = categoryMap[content.cid];
-      content['authorName'] = authors[content.authorId]?.screenName || '';
-      content['categories'] = categories || [];
-      return content as IContent;
-    });
-    return {
-      items,
-      total,
-      pageIndex,
-      pageSize,
-    };
+    const userMap = await this.userService.findUserMap();
+    const categoryMap = await this.relationService.findContentMetaMapByCids(cids, 'category');
+    const tagMap = await this.relationService.findContentMetaMapByCids(cids, 'tag');
+    const items = contents.map((content) => ({
+      cid: content.cid,
+      slug: content.slug,
+      title: content.title,
+      excerpt: getExcerpt(content.text),
+      authorId: content.authorId,
+      authorName: userMap[content.authorId]?.screenName || '',
+      categories: categoryMap[content.cid] || [],
+      tags: tagMap[content.cid] || [],
+      createdAt: format(content.created * 1000),
+      modifiedAt: format(content.modified * 1000),
+    }));
+    return { items, total, pageIndex, pageSize };
   }
 
   async findById(cid: number): Promise<ContentEntity> {
     const content = await this.ensureExist({ cid }, '文章不存在');
-    return content;
-  }
-
-  async findBySlug(slug: string): Promise<ContentEntity> {
-    const content = await this.ensureExist({ slug }, '文章不存在');
     return content;
   }
 
@@ -127,29 +124,37 @@ export class ContentsService extends BaseService<ContentEntity> {
     return null;
   }
 
-  async findPosts({ pageIndex, pageSize }) {
-    const [posts, total] = await this.contentRepo.findAndCount({
-      where: { type: 'post' },
-      order: { cid: 'DESC' },
-      select: ['cid', 'slug', 'title', 'text', 'created', 'modified'],
-      take: pageSize,
-      skip: (pageIndex - 1) * pageSize,
-    });
-    return { posts, total };
-  }
-
   async findPages() {
-    const pages = await this.contentRepo.find({
+    const contents = await this.contentRepo.find({
       where: { type: 'page' },
-      select: ['cid', 'slug', 'title'],
+      order: { modified: 'DESC' },
+      // select: ['cid', 'slug', 'title', 'text', 'authorId', 'created', 'modified'],
     });
-    return pages;
+    // const pages = await this.attachExtraToContents(contents);
+    // return pages;
+    return contents;
   }
 
-  async findByIdOrSlug(input) {
+  async findByIdOrSlug(input, needHtml?: boolean): Promise<ContentVo> {
+    const { postDateFormat } = await this.optionService.findSiteConfig();
+    const format = (timestamp) => dayjs(timestamp).format(postDateFormat || 'YYYY-MM-DD');
     const content = await this.contentRepo.findOne({
       where: [{ cid: input }, { slug: input }],
+      select: ['cid', 'slug', 'title', 'text', 'authorId', 'created', 'modified'],
     });
-    return content;
+    return {
+      cid: content.cid,
+      slug: content.slug,
+      title: content.title,
+      text: content.text,
+      excerpt: getExcerpt(content.text),
+      authorId: content.authorId,
+      authorName: await this.userService.findScreenNameByUid(content.authorId),
+      categories: await this.relationService.findMetasByCid(content.cid, 'category'),
+      tags: await this.relationService.findMetasByCid(content.cid, 'tag'),
+      createdAt: format(content.created * 1000),
+      modifiedAt: format(content.modified * 1000),
+      html: needHtml ? md2html(content.text) : '',
+    };
   }
 }

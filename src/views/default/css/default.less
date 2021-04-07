@@ -1,6 +1,37 @@
 @import '_base';
 @import '_github';
 
+@background-color: #f0f0f0;
+@font-color: #444;
+@link-color: #0066b8;
+
+body {
+  padding: 30px 15px;
+  word-wrap: break-word;
+  letter-spacing: 0.8px;
+  line-height: 1.6;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei UI', 'Microsoft YaHei', Arial, sans-serif;
+  color: @font-color;
+  text-rendering: optimizeLegibility;
+  background: @background-color url('../img/light-bg.png');
+}
+
+a {
+  color: @link-color;
+  text-decoration: none;
+  background-color: initial;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a:active,
+a:hover {
+  outline-width: 0;
+}
+
 .header,
 .aside,
 .main,
@@ -15,7 +46,11 @@
     border: none;
     margin: 0;
     font-weight: 400;
-    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, Helvetica, STKaiti, SimSun, serif;
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
   }
 }
 
@@ -34,9 +69,49 @@
 
 .article {
   &__title {
+    font-size: 22px;
+    line-height: 1.4;
+    margin-bottom: 14px;
+
     a {
       color: #444;
       text-decoration: none;
     }
+  }
+
+  &__tags {
+    margin-bottom: 10px;
+
+    .tag {
+      display: inline-block;
+      vertical-align: middle;
+      padding: 0 8px;
+      font-size: 12px;
+      line-height: 1.67;
+      border-radius: 2px;
+      -moz-border-radius: 2px;
+      -webkit-border-radius: 2px;
+      width: auto;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      word-wrap: normal;
+      font-style: normal;
+      letter-spacing: normal;
+      background: #2c2c32;
+      color: #fff;
+      text-decoration: none;
+      margin-right: 10px;
+    }
+  }
+
+  &__meta {
+    margin-bottom: 10px;
+    color: #3f3f3f;
+    font-size: 15px;
+  }
+
+  &__excerpt {
+    margin-bottom: 10px;
   }
 }

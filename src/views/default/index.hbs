@@ -8,18 +8,16 @@
       {{/if}}
     </h2>
 
-    <p>
-      <small>{{authorName}}&nbsp;•&nbsp;{{createdAt}}</small>
-    </p>
+    <div class='article__meta'>{{authorName}}&nbsp;•&nbsp;{{createdAt}}</div>
 
-    <p>{{{excerpt}}}</p>
+    <div class='article__excerpt'>{{{excerpt}}}</div>
 
-    <p class='article__more'>
+    <div class='article__more'>
       {{#if slug}}
         <a href="/post/{{slug}}.html" title='{{title}}'>- 阅读全文 -</a>
       {{else}}
         <a href="/post/{{cid}}.html" title='{{title}}'>- 阅读全文 -</a>
       {{/if}}
-    </p>
+    </div>
   </article>
 {{/each}}

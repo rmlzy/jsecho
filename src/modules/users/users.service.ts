@@ -1,18 +1,19 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Not, Repository } from 'typeorm';
-import { uniq } from 'lodash';
-import { UserEntity } from '../../entities';
-import { generateHashedPassword, isNotXss, BaseService } from '../../common';
+import { keyBy } from 'lodash';
+import { BaseService } from '../../base';
+import { isNotXss, generateHashedPassword } from '../../utils';
+import { UpdateProfileDto } from '../public/public-api/dto/update-profile.dto';
+import { UpdatePasswordDto } from '../public/public-api/dto/update-password.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UpdateProfileDto, UpdatePasswordDto } from '../../common';
+import { UserMapVo } from './vo/create-user.vo';
+import { UserEntity } from './entity/user.entity';
 
 @Injectable()
 export class UsersService extends BaseService<UserEntity> {
-  constructor(
-    @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>, // private authService: AuthService,
-  ) {
+  constructor(@InjectRepository(UserEntity) private userRepo: Repository<UserEntity>) {
     super(userRepo);
   }
 
@@ -51,13 +52,16 @@ export class UsersService extends BaseService<UserEntity> {
     return user;
   }
 
-  async findByUids(uids: number[]): Promise<UserEntity[]> {
-    uids = uniq(uids);
+  async findUserMap(): Promise<UserMapVo> {
     const users = await this.userRepo.find({
-      where: { uid: In(uids) },
       select: ['uid', 'screenName'],
     });
-    return users;
+    return keyBy(users, 'uid');
+  }
+
+  async findScreenNameByUid(uid: number) {
+    const user = await this.userRepo.findOne({ where: { uid }, select: ['uid', 'screenName'] });
+    return user?.screenName;
   }
 
   async findLoginInfoByAccount(nameOrMail: string): Promise<UserEntity> {

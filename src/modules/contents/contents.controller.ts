@@ -10,11 +10,11 @@ import {
   HttpStatus,
   UseGuards,
 } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { LoggedGuard, Roles } from '../../guards';
 import { ContentsService } from './contents.service';
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
-import { LoggedGuard, Roles } from '../../guards';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('文章')
 @Controller('contents')

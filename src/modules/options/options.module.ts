@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { OptionsService } from './options.service';
 import { OptionsController } from './options.controller';
-import { OptionEntity } from '../../entities';
+import { OptionEntity } from './entity/option.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([OptionEntity])],

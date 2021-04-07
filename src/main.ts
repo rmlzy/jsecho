@@ -7,8 +7,8 @@ import * as favicon from 'serve-favicon';
 import * as csurf from 'csurf';
 import { setupSwagger } from './swagger';
 import { AppModule } from './app.module';
-import { ValidationPipe } from './pipes/validation.pipe';
-import { isDevelop } from './common';
+import { ValidationPipe } from './pipes';
+import { isDevelop } from './utils';
 import { HttpExceptionFilter } from './filters';
 
 async function bootstrap() {
