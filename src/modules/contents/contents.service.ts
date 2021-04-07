@@ -12,7 +12,6 @@ import { RelationshipEntity } from '../relationships/entity/relationship.entity'
 import { CreateContentDto } from './dto/create-content.dto';
 import { UpdateContentDto } from './dto/update-content.dto';
 import { ContentPageVo, ContentVo } from './vo/content.vo';
-import { IContentPage } from './interface/content.interface';
 import { ContentEntity } from './entity/content.entity';
 
 @Injectable()
@@ -67,7 +66,7 @@ export class ContentsService extends BaseService<ContentEntity> {
     const format = (timestamp) => dayjs(timestamp).format(postDateFormat || 'YYYY-MM-DD');
     const [contents, total] = await this.contentRepo.findAndCount({
       where: { type: 'post' },
-      order: { modified: 'DESC' },
+      order: { cid: 'DESC' },
       take: pageSize,
       skip: (pageIndex - 1) * pageSize,
       select: ['cid', 'slug', 'title', 'text', 'authorId', 'created', 'modified'],
@@ -128,10 +127,8 @@ export class ContentsService extends BaseService<ContentEntity> {
     const contents = await this.contentRepo.find({
       where: { type: 'page' },
       order: { modified: 'DESC' },
-      // select: ['cid', 'slug', 'title', 'text', 'authorId', 'created', 'modified'],
+      select: ['cid', 'slug', 'title'],
     });
-    // const pages = await this.attachExtraToContents(contents);
-    // return pages;
     return contents;
   }
 

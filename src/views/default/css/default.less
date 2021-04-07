@@ -1,20 +1,23 @@
 @import '_base';
 @import '_github';
 
-@background-color: #f0f0f0;
-@font-color: #444;
-@link-color: #0066b8;
+@light-bg: #f9f7f7;
+@dark-bg: #112d4e;
+@primary-color: #24292e;
+@second-color: #586069;
+@link-color: #d73a49;
 
 body {
-  padding: 30px 15px;
+  margin: 0;
   word-wrap: break-word;
   letter-spacing: 0.8px;
+  font-size: 16px;
   line-height: 1.6;
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC',
     'Hiragino Sans GB', 'Microsoft YaHei UI', 'Microsoft YaHei', Arial, sans-serif;
-  color: @font-color;
+  color: @primary-color;
   text-rendering: optimizeLegibility;
-  background: @background-color url('../img/light-bg.png');
+  background: #f1f1f1 url('../img/light-bg.png');
 }
 
 a {
@@ -34,6 +37,7 @@ a:hover {
 
 .header,
 .aside,
+.nav,
 .main,
 .footer {
   max-width: 870px;
@@ -44,17 +48,44 @@ a:hover {
 .header {
   &__logo {
     border: none;
-    margin: 0;
-    font-weight: 400;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, Helvetica, STKaiti, SimSun, serif;
+
+    .heart {
+      display: inline-block;
+      animation: beatForVina 1.2s infinite;
+    }
 
     a {
-      color: inherit;
+      //color: inherit;
       text-decoration: none;
     }
   }
 }
 
 .aside {
+  position: relative;
+  margin-bottom: 30px;
+  padding-left: 115px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  &__logo {
+    position: absolute;
+    top: 0;
+    left: 15px;
+    width: 85px;
+    height: 85px;
+    border-radius: 50%;
+  }
+
+  p {
+    margin: 0;
+    line-height: 1.8;
+  }
+}
+
+.nav {
   ul {
     list-style: none;
     padding: 0;
@@ -67,14 +98,19 @@ a:hover {
   }
 }
 
+.footer {
+  padding: 20px 15px;
+}
+
 .article {
+  margin-bottom: 16px;
+
   &__title {
     font-size: 22px;
     line-height: 1.4;
-    margin-bottom: 14px;
+    border: none;
 
     a {
-      color: #444;
       text-decoration: none;
     }
   }
@@ -98,7 +134,7 @@ a:hover {
       word-wrap: normal;
       font-style: normal;
       letter-spacing: normal;
-      background: #2c2c32;
+      background: @dark-bg;
       color: #fff;
       text-decoration: none;
       margin-right: 10px;
@@ -107,11 +143,36 @@ a:hover {
 
   &__meta {
     margin-bottom: 10px;
-    color: #3f3f3f;
     font-size: 15px;
   }
 
   &__excerpt {
     margin-bottom: 10px;
+    color: @second-color;
+    font-size: 15px;
+  }
+
+  &__more {
+  }
+}
+
+@keyframes beatForVina {
+  0% {
+    transform: scale(0.8);
+  }
+  5% {
+    transform: scale(0.9);
+  }
+  10% {
+    transform: scale(0.8);
+  }
+  15% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.8);
+  }
+  100% {
+    transform: scale(0.8);
   }
 }

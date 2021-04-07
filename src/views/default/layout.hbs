@@ -9,17 +9,29 @@
   <meta name="generator" content="{{generator}}" />
   <meta name="template" content="{{theme}}" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="/public/default/img/favicon.ico" />
   <link rel="stylesheet" href="/public/default/css/default.css">
 </head>
 
 <body>
 <header class="header">
   <h1 class='header__logo'>
-    <a href='/'>{{title}}</a>
+    <a href='/'>
+      <span>远子</span>
+      <span class='heart'>💖</span>
+      <span>Vina</span>
+    </a>
   </h1>
 </header>
 
 <aside class="aside">
+  <img class="aside__logo" src="/public/default/img/avatar.jpeg">
+  <p><a href="/about-rmlzy.html">远子</a>: 一只程序猿 🐒</p>
+  <p><a href="/about-vina.html">Vina</a>: 一只产品汪 🐶</p>
+  <p>我们有一个可爱的<a href="/about-tian.html">宝宝</a>~</p>
+</aside>
+
+<nav class="nav">
   <ul>
     {{#each pages}}
       <li>
@@ -27,9 +39,9 @@
       </li>
     {{/each}}
   </ul>
-</aside>
+</nav>
 
 <main class='main'>{{{body}}}</main>
 
-<footer></footer>
+<footer class='footer'>© 2019-2021, 鲁ICP备20009856号</footer>
 </body>
