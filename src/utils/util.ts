@@ -23,7 +23,7 @@ export const md2html = (markdown) => {
   return md.render(markdown);
 };
 
-export const getVersion = () => {
+export const getGenerator = (): string => {
   return `${pkg.name} ${pkg.version}/${pkg.publishAt}`;
 };
 

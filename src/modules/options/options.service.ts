@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Connection, Repository } from 'typeorm';
 import { BaseService } from '../../base';
-import { optionsToMap } from '../../utils';
+import { optionsToMap, getGenerator } from '../../utils';
 import { OptionEntity } from './entity/option.entity';
 import { IOptions } from './interface/option.interface';
 
@@ -14,8 +14,26 @@ export class OptionsService extends BaseService<OptionEntity> {
   constructor(
     @InjectRepository(OptionEntity)
     private optionRepo: Repository<OptionEntity>,
+    private connection: Connection,
   ) {
     super(optionRepo);
+  }
+
+  async overrideTypechoConfig() {
+    const configs = [
+      { name: 'generator', value: getGenerator() },
+      { name: 'postDateFormat', value: 'YYYY年MM月DD日' },
+      { name: 'commentDateFormat', value: 'YYYY年MM月DD日 HH:mm:ss' },
+    ];
+    for (let i = 0; i < configs.length; i++) {
+      const config = configs[i];
+      await this.optionRepo.update(
+        { user: 0, name: config.name },
+        {
+          value: config.value,
+        },
+      );
+    }
   }
 
   findAll(): Promise<OptionEntity[]> {
@@ -32,6 +50,7 @@ export class OptionsService extends BaseService<OptionEntity> {
       return this.options;
     }
     const options = await this.findDefault();
+    options.generator = getGenerator();
     this.options = options;
     return options;
   }

@@ -1,3 +1,5 @@
+import { FastifyReply } from 'fastify';
+
 export interface IResponse<T> {
   code: number;
   message: string;
@@ -9,4 +11,9 @@ export interface IPaginate<T> {
   pageSize: number;
   total: number;
   items: T[];
+}
+
+export interface Reply {
+  view(page: string, data?: object): FastifyReply;
+  locals?: object;
 }

@@ -3,7 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { NestFastifyApplication, FastifyAdapter } from '@nestjs/platform-fastify';
 import * as compression from 'compression';
 import * as helmet from 'helmet';
-import * as favicon from 'serve-favicon';
+import * as htmlMinifier from 'html-minifier';
 import * as csurf from 'csurf';
 import { setupSwagger } from './swagger';
 import { AppModule } from './app.module';
@@ -30,17 +30,21 @@ async function bootstrap() {
     viewExt: 'html',
     options: {
       autoescape: true,
-      onConfigure: (env) => {
-        // env.configure(resolve('./src/views'), { autoescape: true });
+      useHtmlMinifier: htmlMinifier,
+      htmlMinifierOptions: {
+        removeComments: true,
+        removeCommentsFromCDATA: true,
+        collapseWhitespace: true,
+        collapseBooleanAttributes: true,
+        removeAttributeQuotes: true,
+        removeEmptyAttributes: true,
       },
     },
   });
-
   app.enableCors();
   if (isDevelop()) {
     setupSwagger(app);
   }
-
   const port = app.get('ConfigService').get('SERVER_PORT');
   await app.listen(port);
   console.log(`Server started at http://localhost:${port}!`);

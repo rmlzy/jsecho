@@ -1,14 +1,21 @@
 import { Controller, Get, Param, Res } from '@nestjs/common';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
+import { RedisService } from 'nestjs-redis';
 import { OptionsService } from '../../options/options.service';
 import { PublicViewService } from './public-view.service';
+import { Reply } from '../../../base';
 
 @Controller('')
 export class PublicViewController {
   theme = '';
   sharedVars = {};
+  redis = null;
 
-  constructor(private viewService: PublicViewService, private optionService: OptionsService) {}
+  constructor(
+    private viewService: PublicViewService,
+    private optionService: OptionsService,
+    private redisService: RedisService,
+  ) {}
 
   private async ensureSharedVars() {
     if (this.theme) return;
@@ -21,13 +28,28 @@ export class PublicViewController {
     };
   }
 
+  private async getCacheByName(name) {
+    const redis = await this.redisService.getClient();
+    const cache = await redis.get(name);
+    if (cache) {
+      console.log('Use Redis Cache');
+    }
+    return cache;
+  }
+
   @ApiExcludeEndpoint()
   @Get()
-  async home(@Res() reply) {
+  async home(@Res() reply: Reply) {
+    const cache = await this.getCacheByName('home.html');
+    if (cache) {
+      return cache;
+    }
+
     await this.ensureSharedVars();
     const pageIndex = 1;
     const { posts, hasPrevPage, hasNextPage } = await this.viewService.findPosts(pageIndex);
-    reply.view(`${this.theme}/index`, {
+    // TODO: 缓存到 REDIS
+    return reply.view(`${this.theme}/index`, {
       ...this.sharedVars,
       hasNextPage,
       hasPrevPage,
@@ -67,7 +89,6 @@ export class PublicViewController {
     input = input.replace('.html', '');
     await this.ensureSharedVars();
     const page = await this.viewService.findPost(input);
-    console.log(page);
     return reply.view(`${this.theme}/page`, {
       ...this.sharedVars,
       page,

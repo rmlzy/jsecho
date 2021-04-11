@@ -1,6 +1,7 @@
 import { APP_INTERCEPTOR, APP_GUARD } from '@nestjs/core';
 import { CacheInterceptor, CacheModule, HttpModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { RedisModule } from 'nestjs-redis';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -43,6 +44,12 @@ import { UserEntity } from './modules/users/entity/user.entity';
         database: config.get('MYSQL.DATABASE') as string,
         entities: [UserEntity, ContentEntity, MetaEntity, OptionEntity, RelationshipEntity],
         synchronize: true,
+      }),
+    }),
+    RedisModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        url: config.get('REDIS_URI'),
       }),
     }),
     CacheModule.registerAsync({
