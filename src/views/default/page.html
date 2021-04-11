@@ -1,0 +1,15 @@
+{% extends "./layout.html" %}
+
+{% block body %}
+<article class='article'>
+  <div class='article__title'>{{ page.title }}</div>
+  <div class='article__tags'>
+    {% for item in page.tags %}
+    <a class='tag' href='/tag/{{ item.slug }}'>{{ item.name }}</a>
+    {% endfor %}
+  </div>
+  <div class='article__meta'>{{ page.authorName }}&nbsp;•&nbsp;{{ page.createdAt }}</div>
+
+  {{ page.html | safe }}
+</article>
+{% endblock %}

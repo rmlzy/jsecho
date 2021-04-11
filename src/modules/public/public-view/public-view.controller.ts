@@ -1,7 +1,5 @@
-import { Controller, Get, Param, Res, CacheTTL } from '@nestjs/common';
-import { Response } from 'express';
+import { Controller, Get, Param, Res } from '@nestjs/common';
 import { ApiExcludeEndpoint } from '@nestjs/swagger';
-import { ONE_HOUR } from '../../../constants';
 import { OptionsService } from '../../options/options.service';
 import { PublicViewService } from './public-view.service';
 
@@ -19,19 +17,17 @@ export class PublicViewController {
     this.theme = 'default';
     this.sharedVars = {
       ...siteConfig,
-      layout: `${this.theme}/layout`,
       pages,
     };
   }
 
   @ApiExcludeEndpoint()
-  @CacheTTL(ONE_HOUR) // TODO: 似乎不工作
   @Get()
-  async home(@Res() res: Response) {
+  async home(@Res() reply) {
     await this.ensureSharedVars();
     const pageIndex = 1;
     const { posts, hasPrevPage, hasNextPage } = await this.viewService.findPosts(pageIndex);
-    res.render(`${this.theme}/index`, {
+    reply.view(`${this.theme}/index`, {
       ...this.sharedVars,
       hasNextPage,
       hasPrevPage,
@@ -40,12 +36,12 @@ export class PublicViewController {
   }
 
   @ApiExcludeEndpoint()
-  @CacheTTL(ONE_HOUR)
-  @Get('page/:pageIndex.html')
-  async blogList(@Param('pageIndex') pageIndex, @Res() res: Response) {
+  @Get('page/:pageIndex')
+  async blogList(@Param('pageIndex') pageIndex, @Res() reply) {
+    pageIndex = pageIndex.replace('.html', '');
     await this.ensureSharedVars();
     const { posts, hasPrevPage, hasNextPage } = await this.viewService.findPosts(+pageIndex);
-    return res.render(`${this.theme}/index`, {
+    return reply.view(`${this.theme}/index`, {
       ...this.sharedVars,
       hasNextPage,
       hasPrevPage,
@@ -54,24 +50,25 @@ export class PublicViewController {
   }
 
   @ApiExcludeEndpoint()
-  @CacheTTL(ONE_HOUR)
-  @Get('post/:input.html')
-  async blog(@Param('input') input, @Res() res: Response) {
+  @Get('post/:input')
+  async blog(@Param('input') input, @Res() reply) {
+    input = input.replace('.html', '');
     await this.ensureSharedVars();
     const post = await this.viewService.findPost(input);
-    return res.render(`${this.theme}/post`, {
+    return reply.view(`${this.theme}/post`, {
       ...this.sharedVars,
       post,
     });
   }
 
   @ApiExcludeEndpoint()
-  @CacheTTL(ONE_HOUR)
-  @Get(':input.html')
-  async singlePage(@Param('input') input, @Res() res: Response) {
+  @Get(':input')
+  async singlePage(@Param('input') input, @Res() reply) {
+    input = input.replace('.html', '');
     await this.ensureSharedVars();
     const page = await this.viewService.findPost(input);
-    return res.render(`${this.theme}/page`, {
+    console.log(page);
+    return reply.view(`${this.theme}/page`, {
       ...this.sharedVars,
       page,
     });

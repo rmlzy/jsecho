@@ -33,15 +33,18 @@
 
 <nav class="nav">
   <ul>
-    {{#each pages}}
-      <li>
-        <a href='/{{slug}}.html'>@{{title}}</a>
-      </li>
-    {{/each}}
+    {% for item in pages %}
+    <li>
+      <a href='/{{item.slug}}.html'>@{{item.title}}</a>
+    </li>
+    {% endfor %}
   </ul>
 </nav>
 
-<main class='main'>{{{body}}}</main>
+<main class='main'>
+  {% block body %}
+  {% endblock %}
+</main>
 
 <footer class='footer'>© 2019-2021, 鲁ICP备20009856号</footer>
 </body>

@@ -1,0 +1,27 @@
+{% extends "./layout.html" %}
+
+{% block body %}
+{% for item in posts %}
+<article class='article'>
+  <h2 class='article__title'>
+    {% if item.slug %}
+    <a href='/post/{{item.slug}}.html' title='{{ item.title }}'>{{ item.title }}</a>
+    {% else %}
+    <a href='/post/{{item.cid}}.html' title='{{ item.title }}'>{{ item.title }}</a>
+    {% endif %}
+  </h2>
+
+  <div class='article__meta'>{{ item.authorName }}&nbsp;•&nbsp;{{ item.createdAt }}</div>
+
+  <div class='article__excerpt'>{{ item.excerpt | safe }}</div>
+
+  <div class='article__more'>
+    {% if item.slug %}
+    <a href='/post/{{item.slug}}.html' title='{{ item.title }}'>- 阅读全文 -</a>
+    {% else %}
+    <a href='/post/{{item.cid}}.html' title='{{ item.title }}'>- 阅读全文 -</a>
+    {% endif %}
+  </div>
+</article>
+{% endfor %}
+{% endblock %}
