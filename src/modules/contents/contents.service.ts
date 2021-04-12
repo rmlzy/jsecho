@@ -126,7 +126,7 @@ export class ContentsService extends BaseService<ContentEntity> {
   async findPages() {
     const contents = await this.contentRepo.find({
       where: { type: 'page' },
-      order: { modified: 'DESC' },
+      order: { order: 'ASC' },
       select: ['cid', 'slug', 'title'],
     });
     return contents;
