@@ -5,7 +5,7 @@ import { RedisModule } from 'nestjs-redis';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import environment from './environments';
+import { config } from './config';
 import { AppController } from './app.controller';
 import { RoleGuard } from './guards';
 import { TaskService } from './schedules/task/task.service';
@@ -31,7 +31,7 @@ import { UserEntity } from './modules/users/entity/user.entity';
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,
-      load: [environment],
+      load: [config],
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
