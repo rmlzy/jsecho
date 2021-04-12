@@ -6,17 +6,18 @@ import { IPaginate, IContent } from './interface/public-view.interface';
 
 @Injectable()
 export class PublicViewService {
-  pages = null;
+  sharedVars = null;
 
   constructor(private optionService: OptionsService, private contentService: ContentsService) {}
 
-  async findPages() {
-    if (this.pages) {
-      return this.pages;
-    }
+  async findSharedVars() {
+    const siteConfig = await this.optionService.findSiteConfig();
     const pages = await this.contentService.findPages();
-    this.pages = pages;
-    return pages;
+    return {
+      ...siteConfig,
+      pages,
+      theme: 'default',
+    };
   }
 
   async findPosts(pageIndex): Promise<IPaginate<IContent>> {

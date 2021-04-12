@@ -1,16 +1,14 @@
 {% extends "./layout.html" %}
 
-<!---->
-{% block main %}
-<article class="article">
-  <div class="article__title">{{ post.title }}</div>
-  <div class="article__tags">
-    {% for item in post.tags %}
-    <a class="tag" href="/tag/{{ item.slug }}">{{ item.name }}</a>
-    {% endfor %}
-  </div>
-  <div class="article__meta">{{ post.authorName }}&nbsp;•&nbsp;{{ post.createdAt }}</div>
+<!-- Header -->
+{% block header %}
+<header>
+  <p><a href="/">..</a></p>
+  <p class="text-right">{{ post.createdAt }}</p>
+</header>
+{% endblock %}
 
-  {{ post.html | safe }}
-</article>
+<!-- Main -->
+{% block main %}
+<article>{{ post.html | safe }}</article>
 {% endblock %}

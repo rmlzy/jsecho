@@ -1,20 +1,30 @@
 {% extends "./layout.html" %}
 
-<!---->
+<!-- Header -->
+{% block header %}
+<header class="text-center">
+  <h1>{{ title }}</h1>
+  <p>{{ description }}</p>
+  <p>
+    {% for item in pages %}
+    <a href="">{{ item.title }}</a>
+    {% endfor %}
+  </p>
+  <hr />
+</header>
+{% endblock %}
+
+<!-- Main -->
 {% block main %}
-<!---->
-{% for item in posts %}
-<article>
-  <h2>
+<ul>
+  {% for item in posts %}
+  <li>
     {% if item.slug %}
     <a href="/post/{{item.slug}}.html" title="{{ item.title }}">{{ item.title }}</a>
     {% else %}
     <a href="/post/{{item.cid}}.html" title="{{ item.title }}">{{ item.title }}</a>
     {% endif %}
-  </h2>
-  <p>{{ item.authorName }}{{ item.createdAt }}</p>
-  {{ item.excerpt | safe }}
-</article>
-{% endfor %}
-<!---->
+  </li>
+  {% endfor %}
+</ul>
 {% endblock %}
