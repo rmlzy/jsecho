@@ -7,7 +7,13 @@
   <p>{{ description }}</p>
   <p>
     {% for item in pages %}
-    <a href="">{{ item.title }}</a>
+    <!-- -->
+    {% if item.slug %}
+    <a href="/page/{{item.slug}}.html" title="{{ item.title }}">{{ item.title }}</a>
+    {% else %}
+    <a href="/page/{{item.cid}}.html" title="{{ item.title }}">{{ item.title }}</a>
+    {% endif %}
+    <!-- -->
     {% endfor %}
   </p>
   <hr />

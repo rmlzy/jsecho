@@ -25,20 +25,6 @@ export class PublicViewController {
   }
 
   @ApiExcludeEndpoint()
-  @Get('page/:pageIndex')
-  async blogList(@Param('pageIndex') pageIndex, @Res() reply) {
-    pageIndex = pageIndex.replace('.html', '');
-    const sharedVars = await this.viewService.findSharedVars();
-    const { posts, hasPrevPage, hasNextPage } = await this.viewService.findPosts(+pageIndex);
-    return reply.view(`${sharedVars.theme}/index`, {
-      ...sharedVars,
-      hasNextPage,
-      hasPrevPage,
-      posts,
-    });
-  }
-
-  @ApiExcludeEndpoint()
   @Get('post/:input')
   async blog(@Param('input') input, @Res() reply) {
     input = input.replace('.html', '');
@@ -51,7 +37,7 @@ export class PublicViewController {
   }
 
   @ApiExcludeEndpoint()
-  @Get('s/:input')
+  @Get('page/:input')
   async singlePage(@Param('input') input, @Res() reply) {
     input = input.replace('.html', '');
     const sharedVars = await this.viewService.findSharedVars();
