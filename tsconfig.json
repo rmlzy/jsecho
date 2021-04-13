@@ -11,8 +11,10 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
-    "assets": [
-      "./src/public/**/*"
-    ]
+    "assets": ["./src/public/**/*"],
+    "paths": {
+      "@": ["./src/"],
+      "@/*": ["./src/*"]
+    }
   }
 }

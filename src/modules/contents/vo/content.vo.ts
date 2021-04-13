@@ -1,4 +1,4 @@
-import { MetaVo } from '../../metas/vo/meta.vo';
+import { MetaVo } from "../../metas/vo/meta.vo";
 
 export interface ContentMetaMapVo {
   [key: number]: MetaVo[];

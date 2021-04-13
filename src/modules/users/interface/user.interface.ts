@@ -1,1 +1,1 @@
-export type IUserGroup = 'administrator' | 'editor' | 'contributor' | 'subscriber' | 'visitor';
+export type IUserGroup = "administrator" | "editor" | "contributor" | "subscriber" | "visitor";

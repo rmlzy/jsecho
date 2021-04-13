@@ -1,7 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({
-  name: 'pp_metas',
+  name: "pp_metas",
 })
 export class MetaEntity {
   @PrimaryGeneratedColumn()
@@ -19,12 +19,12 @@ export class MetaEntity {
   @Column({ length: 200 })
   description: string;
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ type: "int", default: 0 })
   count: number;
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ type: "int", default: 0 })
   order: number;
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ type: "int", default: 0 })
   parent: number;
 }

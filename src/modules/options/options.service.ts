@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, Repository } from 'typeorm';
-import { BaseService } from '../../base';
-import { optionsToMap, getGenerator } from '../../utils';
-import { OptionEntity } from './entity/option.entity';
-import { IOptions } from './interface/option.interface';
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Connection, Repository } from "typeorm";
+import { BaseService } from "@/base";
+import { optionsToMap, getGenerator } from "@/utils";
+import { OptionEntity } from "./entity/option.entity";
+import { IOptions } from "./interface/option.interface";
 
 @Injectable()
 export class OptionsService extends BaseService<OptionEntity> {
@@ -21,9 +21,9 @@ export class OptionsService extends BaseService<OptionEntity> {
 
   async overrideTypechoConfig() {
     const configs = [
-      { name: 'generator', value: getGenerator() },
-      { name: 'postDateFormat', value: 'YYYY年MM月DD日' },
-      { name: 'commentDateFormat', value: 'YYYY年MM月DD日 HH:mm:ss' },
+      { name: "generator", value: getGenerator() },
+      { name: "postDateFormat", value: "YYYY年MM月DD日" },
+      { name: "commentDateFormat", value: "YYYY年MM月DD日 HH:mm:ss" },
     ];
     for (let i = 0; i < configs.length; i++) {
       const config = configs[i];

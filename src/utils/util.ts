@@ -1,9 +1,9 @@
-const xss = require('xss');
-const dayjs = require('dayjs');
-const _ = require('lodash');
-const MarkdownIt = require('markdown-it');
-import * as hljs from 'highlight.js';
-const pkg = require('../../package.json');
+const xss = require("xss");
+const dayjs = require("dayjs");
+const _ = require("lodash");
+const MarkdownIt = require("markdown-it");
+import * as hljs from "highlight.js";
+const pkg = require("../../package.json");
 
 const md = MarkdownIt({
   html: true,
@@ -15,7 +15,7 @@ const md = MarkdownIt({
         return hljs.highlight(str, { language: lang }).value;
       } catch (__) {}
     }
-    return '';
+    return "";
   },
 });
 
@@ -33,7 +33,7 @@ export const isNotXss = (text: string) => {
   return filtered === text;
 };
 
-export const isDevelop = () => process.env.NODE_ENV === 'development';
+export const isDevelop = () => process.env.NODE_ENV === "development";
 
 export const getTimestamp = (date?: string) => {
   const d = dayjs(date);
@@ -44,7 +44,7 @@ export const removeEmptyColumns = (obj) => {
   const output = {};
   Object.keys(obj).forEach((key) => {
     const value = obj[key];
-    if (value !== '' && value !== undefined) {
+    if (value !== "" && value !== undefined) {
       output[key] = value;
     }
   });
@@ -62,9 +62,9 @@ export const optionsToMap = (options) => {
 };
 
 export const getExcerpt = (text: string): string => {
-  let subIndex = text.indexOf('<!--more-->');
+  let subIndex = text.indexOf("<!--more-->");
   if (subIndex === -1) {
-    subIndex = text.indexOf('<!-- more -->');
+    subIndex = text.indexOf("<!-- more -->");
   }
   const excerpt = text.substring(0, subIndex);
   return md2html(excerpt);

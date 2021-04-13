@@ -1,7 +1,7 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity } from "typeorm";
 
 @Entity({
-  name: 'pp_options',
+  name: "pp_options",
 })
 export class OptionEntity {
   @Column({ length: 32, nullable: false, primary: true })
@@ -10,6 +10,6 @@ export class OptionEntity {
   @Column({ default: 0, nullable: false, unsigned: true, primary: true })
   user: number;
 
-  @Column({ type: 'text' })
+  @Column({ type: "text" })
   value: string;
 }

@@ -9,60 +9,60 @@ import {
   Query,
   HttpStatus,
   UseGuards,
-} from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { LoggedGuard, Roles } from '../../guards';
-import { ContentsService } from './contents.service';
-import { CreateContentDto } from './dto/create-content.dto';
-import { UpdateContentDto } from './dto/update-content.dto';
+} from "@nestjs/common";
+import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { LoggedGuard, Roles } from "@/guards";
+import { ContentsService } from "./contents.service";
+import { CreateContentDto } from "./dto/create-content.dto";
+import { UpdateContentDto } from "./dto/update-content.dto";
 
-@ApiTags('文章')
-@Controller('contents')
+@ApiTags("文章")
+@Controller("contents")
 export class ContentsController {
   constructor(private readonly contentsService: ContentsService) {}
 
-  @ApiOperation({ description: '创建文章' })
+  @ApiOperation({ description: "创建文章" })
   @UseGuards(LoggedGuard)
-  @Roles(['administrator', 'editor', 'contributor'])
+  @Roles(["administrator", "editor", "contributor"])
   @Post()
   async create(@Body() createContentDto: CreateContentDto) {
     const res = await this.contentsService.create(createContentDto);
-    return { code: HttpStatus.OK, message: 'OK', data: res };
+    return { code: HttpStatus.OK, message: "OK", data: res };
   }
 
-  @ApiOperation({ description: '获取文章分页列表' })
+  @ApiOperation({ description: "获取文章分页列表" })
   @UseGuards(LoggedGuard)
-  @Roles(['administrator', 'editor', 'contributor'])
+  @Roles(["administrator", "editor", "contributor"])
   @Get()
   async paginate(@Query() query) {
     const res = await this.contentsService.paginate(query);
-    return { code: HttpStatus.OK, message: 'OK', data: res };
+    return { code: HttpStatus.OK, message: "OK", data: res };
   }
 
-  @ApiOperation({ description: '获取文章' })
+  @ApiOperation({ description: "获取文章" })
   @UseGuards(LoggedGuard)
-  @Roles(['administrator', 'editor', 'contributor'])
-  @Get(':cid')
-  async findOne(@Param('cid') cid: string) {
+  @Roles(["administrator", "editor", "contributor"])
+  @Get(":cid")
+  async findOne(@Param("cid") cid: string) {
     const res = await this.contentsService.findById(+cid);
-    return { code: HttpStatus.OK, message: 'OK', data: res };
+    return { code: HttpStatus.OK, message: "OK", data: res };
   }
 
-  @ApiOperation({ description: '更新文章' })
+  @ApiOperation({ description: "更新文章" })
   @UseGuards(LoggedGuard)
-  @Roles(['administrator', 'editor', 'contributor'])
-  @Patch(':cid')
-  async update(@Param('cid') cid: string, @Body() updateContentDto: UpdateContentDto) {
+  @Roles(["administrator", "editor", "contributor"])
+  @Patch(":cid")
+  async update(@Param("cid") cid: string, @Body() updateContentDto: UpdateContentDto) {
     const res = await this.contentsService.update(+cid, updateContentDto);
-    return { code: HttpStatus.OK, message: 'OK', data: res };
+    return { code: HttpStatus.OK, message: "OK", data: res };
   }
 
-  @ApiOperation({ description: '删除文章' })
+  @ApiOperation({ description: "删除文章" })
   @UseGuards(LoggedGuard)
-  @Roles(['administrator', 'editor', 'contributor'])
-  @Delete(':cid')
-  async remove(@Param('cid') cid: string) {
+  @Roles(["administrator", "editor", "contributor"])
+  @Delete(":cid")
+  async remove(@Param("cid") cid: string) {
     const res = await this.contentsService.remove(+cid);
-    return { code: HttpStatus.OK, message: 'OK', data: res };
+    return { code: HttpStatus.OK, message: "OK", data: res };
   }
 }

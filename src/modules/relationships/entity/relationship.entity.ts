@@ -1,7 +1,7 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity } from "typeorm";
 
 @Entity({
-  name: 'pp_relationships',
+  name: "pp_relationships",
 })
 export class RelationshipEntity {
   @Column({ unsigned: true, primary: true })

@@ -1,4 +1,4 @@
-const PasswordHash = require('node-phpass').PasswordHash;
+const PasswordHash = require("node-phpass").PasswordHash;
 
 const hasher = new PasswordHash(8, true, 7);
 

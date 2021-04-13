@@ -1,4 +1,4 @@
-import { FastifyReply } from 'fastify';
+import { FastifyReply } from "fastify";
 
 export interface IResponse<T> {
   code: number;

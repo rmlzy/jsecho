@@ -1,7 +1,7 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { PublicViewController } from './public-view.controller';
+import { Test, TestingModule } from "@nestjs/testing";
+import { PublicViewController } from "./public-view.controller";
 
-describe('PublicViewController', () => {
+describe("PublicViewController", () => {
   let controller: PublicViewController;
 
   beforeEach(async () => {
@@ -12,7 +12,7 @@ describe('PublicViewController', () => {
     controller = module.get<PublicViewController>(PublicViewController);
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(controller).toBeDefined();
   });
 });

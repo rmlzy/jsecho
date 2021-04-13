@@ -1,8 +1,8 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { OptionsController } from './options.controller';
-import { OptionsService } from './options.service';
+import { Test, TestingModule } from "@nestjs/testing";
+import { OptionsController } from "./options.controller";
+import { OptionsService } from "./options.service";
 
-describe('OptionsController', () => {
+describe("OptionsController", () => {
   let controller: OptionsController;
 
   beforeEach(async () => {
@@ -14,7 +14,7 @@ describe('OptionsController', () => {
     controller = module.get<OptionsController>(OptionsController);
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(controller).toBeDefined();
   });
 });

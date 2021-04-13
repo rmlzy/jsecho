@@ -1,21 +1,21 @@
-import { Controller, Get, HttpStatus } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
-import { OptionsService } from './options.service';
+import { Controller, Get, HttpStatus } from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
+import { OptionsService } from "./options.service";
 
-@ApiTags('配置')
-@Controller('options')
+@ApiTags("配置")
+@Controller("options")
 export class OptionsController {
   constructor(private readonly optionService: OptionsService) {}
 
   @Get()
   async findAll() {
     const res = await this.optionService.findAll();
-    return { code: HttpStatus.OK, message: 'OK', data: res };
+    return { code: HttpStatus.OK, message: "OK", data: res };
   }
 
-  @Get('default')
+  @Get("default")
   async findDefault() {
     const res = await this.optionService.findDefault();
-    return { code: HttpStatus.OK, message: 'OK', data: res };
+    return { code: HttpStatus.OK, message: "OK", data: res };
   }
 }

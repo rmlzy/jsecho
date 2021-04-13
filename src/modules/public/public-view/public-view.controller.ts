@@ -1,17 +1,17 @@
-import { Controller, Get, Param, Res } from '@nestjs/common';
-import { ApiExcludeEndpoint } from '@nestjs/swagger';
-import { PublicViewService } from './public-view.service';
-import { Reply } from '../../../base';
+import { Controller, Get, Param, Res } from "@nestjs/common";
+import { ApiExcludeEndpoint } from "@nestjs/swagger";
+import { PublicViewService } from "./public-view.service";
+import { Reply } from "@/base";
 
-@Controller('')
+@Controller("")
 export class PublicViewController {
-  theme = '';
+  theme = "";
   redis = null;
 
   constructor(private viewService: PublicViewService) {}
 
   @ApiExcludeEndpoint()
-  @Get('/')
+  @Get("/")
   async home(@Res() reply: Reply) {
     const sharedVars = await this.viewService.findSharedVars();
     const pageIndex = 1;
@@ -25,9 +25,9 @@ export class PublicViewController {
   }
 
   @ApiExcludeEndpoint()
-  @Get('post/:input')
-  async blog(@Param('input') input, @Res() reply) {
-    input = input.replace('.html', '');
+  @Get("post/:input")
+  async blog(@Param("input") input, @Res() reply) {
+    input = input.replace(".html", "");
     const sharedVars = await this.viewService.findSharedVars();
     const post = await this.viewService.findPost(input);
     return reply.view(`${sharedVars.theme}/post`, {
@@ -37,9 +37,9 @@ export class PublicViewController {
   }
 
   @ApiExcludeEndpoint()
-  @Get('page/:input')
-  async singlePage(@Param('input') input, @Res() reply) {
-    input = input.replace('.html', '');
+  @Get("page/:input")
+  async singlePage(@Param("input") input, @Res() reply) {
+    input = input.replace(".html", "");
     const sharedVars = await this.viewService.findSharedVars();
     const page = await this.viewService.findPost(input);
     return reply.view(`${sharedVars.theme}/page`, {

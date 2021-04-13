@@ -1,25 +1,25 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({
-  name: 'pp_users',
+  name: "pp_users",
 })
 export class UserEntity {
-  @PrimaryGeneratedColumn('increment')
+  @PrimaryGeneratedColumn("increment")
   uid: number;
 
-  @Column({ length: 32, default: '' })
+  @Column({ length: 32, default: "" })
   name: string;
 
-  @Column({ length: 64, default: '', select: false })
+  @Column({ length: 64, default: "", select: false })
   password: string;
 
-  @Column({ length: 200, default: '' })
+  @Column({ length: 200, default: "" })
   mail: string;
 
-  @Column({ length: 200, default: '' })
+  @Column({ length: 200, default: "" })
   url: string;
 
-  @Column({ length: 32, default: '' })
+  @Column({ length: 32, default: "" })
   screenName: string;
 
   @Column({ unsigned: true, default: 0 })
@@ -31,9 +31,9 @@ export class UserEntity {
   @Column({ unsigned: true, default: 0 })
   logged: number;
 
-  @Column({ length: 255, default: 'subscriber' })
+  @Column({ length: 255, default: "subscriber" })
   group: string;
 
-  @Column({ length: 500, default: '', select: false })
+  @Column({ length: 500, default: "", select: false })
   authCode: string;
 }

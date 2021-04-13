@@ -1,1 +1,1 @@
-export type IMetaType = 'category' | 'tag';
+export type IMetaType = "category" | "tag";
