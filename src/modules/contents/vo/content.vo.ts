@@ -21,3 +21,11 @@ export interface ContentVo extends ContentPageVo {
   text?: string;
   html?: string;
 }
+
+interface PageVo {
+  cid: number;
+  slug: string;
+  title: string;
+}
+
+export interface PageListVo extends Array<PageVo> {}

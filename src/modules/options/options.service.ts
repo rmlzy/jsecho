@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Connection, Repository } from "typeorm";
+import { Repository } from "typeorm";
+import { pick } from "lodash";
 import { BaseService } from "@/base";
 import { optionsToMap, getGenerator } from "@/utils";
 import { OptionEntity } from "./entity/option.entity";
@@ -14,7 +15,6 @@ export class OptionsService extends BaseService<OptionEntity> {
   constructor(
     @InjectRepository(OptionEntity)
     private optionRepo: Repository<OptionEntity>,
-    private connection: Connection,
   ) {
     super(optionRepo);
   }
@@ -46,13 +46,19 @@ export class OptionsService extends BaseService<OptionEntity> {
   }
 
   async findSiteConfig() {
-    if (this.options) {
-      return this.options;
-    }
     const options = await this.findDefault();
     options.generator = getGenerator();
-    this.options = options;
-    return options;
+    return pick(options, [
+      "theme",
+      "charset",
+      "generator",
+      "title",
+      "description",
+      "keywords",
+      "pageSize",
+      "postDateFormat",
+      "copyright",
+    ]);
   }
 
   async findByUid(uid: number): Promise<IOptions> {

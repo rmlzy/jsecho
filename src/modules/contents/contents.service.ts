@@ -11,7 +11,7 @@ import { RelationshipsService } from "../relationships/relationships.service";
 import { RelationshipEntity } from "../relationships/entity/relationship.entity";
 import { CreateContentDto } from "./dto/create-content.dto";
 import { UpdateContentDto } from "./dto/update-content.dto";
-import { ContentPageVo, ContentVo } from "./vo/content.vo";
+import { ContentPageVo, ContentVo, PageListVo } from "./vo/content.vo";
 import { ContentEntity } from "./entity/content.entity";
 
 @Injectable()
@@ -123,7 +123,7 @@ export class ContentsService extends BaseService<ContentEntity> {
     return null;
   }
 
-  async findPages() {
+  async findPages(): Promise<PageListVo> {
     const contents = await this.contentRepo.find({
       where: { type: "page" },
       order: { order: "ASC" },
@@ -139,11 +139,10 @@ export class ContentsService extends BaseService<ContentEntity> {
       where: [{ cid: input }, { slug: input }],
       select: ["cid", "slug", "title", "text", "authorId", "created", "modified"],
     });
-    return {
+    const result = {
       cid: content.cid,
       slug: content.slug,
       title: content.title,
-      text: content.text,
       excerpt: getExcerpt(content.text),
       authorId: content.authorId,
       authorName: await this.userService.findScreenNameByUid(content.authorId),
@@ -151,7 +150,12 @@ export class ContentsService extends BaseService<ContentEntity> {
       tags: await this.relationService.findMetasByCid(content.cid, "tag"),
       createdAt: format(content.created * 1000),
       modifiedAt: format(content.modified * 1000),
-      html: needHtml ? md2html(content.text) : "",
     };
+    if (needHtml) {
+      result["html"] = md2html(content.text);
+    } else {
+      result["text"] = content.text;
+    }
+    return result;
   }
 }

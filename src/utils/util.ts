@@ -69,3 +69,23 @@ export const getExcerpt = (text: string): string => {
   const excerpt = text.substring(0, subIndex);
   return md2html(excerpt);
 };
+
+export const safeParse = (str) => {
+  let json;
+  try {
+    json = JSON.parse(str);
+  } catch (e) {
+    // pass
+  }
+  return json;
+};
+
+export const safeStringify = (json) => {
+  let str;
+  try {
+    str = JSON.stringify(json);
+  } catch (e) {
+    // pass
+  }
+  return str;
+};
