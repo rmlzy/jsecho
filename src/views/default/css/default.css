@@ -7,6 +7,15 @@ body {
   letter-spacing: 0.8px;
   color: #404040;
 }
+a {
+  color: #005893;
+  text-decoration: none;
+}
+a:hover,
+a:focus {
+  color: #23527c;
+  text-decoration: underline;
+}
 hr {
   margin: 2rem 0;
 }

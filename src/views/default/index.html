@@ -33,4 +33,13 @@
   </li>
   {% endfor %}
 </ul>
+<p class="text-center">
+  {% if prevPageIndex %}
+  <a href="/p/{{ prevPageIndex }}">Prev</a>
+  {% endif %}
+  <!--  -->
+  {% if nextPageIndex %}
+  <a href="/p/{{ nextPageIndex }}">Next</a>
+  {% endif %}
+</p>
 {% endblock %}

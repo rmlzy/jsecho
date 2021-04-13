@@ -41,9 +41,11 @@ export class WebService {
       pageIndex,
       pageSize: +pageSize,
     });
+    const hasPrevPage = pageIndex > 1;
+    const hasNextPage = pageIndex * Number(pageSize) < total;
     return {
-      hasPrevPage: true,
-      hasNextPage: true,
+      hasPrevPage,
+      hasNextPage,
       posts: items,
     };
   }

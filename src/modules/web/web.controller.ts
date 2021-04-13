@@ -1,10 +1,10 @@
 import { Controller, Get, Param, Req, Res } from "@nestjs/common";
 import { ApiExcludeEndpoint } from "@nestjs/swagger";
+import { RedisService } from "nestjs-redis";
 import { Reply } from "@/base";
+import { safeParse, safeStringify } from "@/utils";
 import { WebService } from "./web.service";
 import { ISharedVars } from "./web.interface";
-import { RedisService } from "nestjs-redis";
-import { safeParse, safeStringify } from "@/utils";
 
 @Controller("")
 export class WebController {
@@ -20,27 +20,45 @@ export class WebController {
     });
   }
 
+  private async findPostsByPageIndex(pageIndex) {
+    pageIndex = Number(pageIndex);
+    const { posts, hasPrevPage, hasNextPage } = await this.webService.findPosts(pageIndex);
+    return {
+      ...this.sharedVars,
+      prevPageIndex: hasPrevPage ? pageIndex - 1 : 0,
+      nextPageIndex: hasNextPage ? pageIndex + 1 : 0,
+      posts,
+    };
+  }
+
   @ApiExcludeEndpoint()
   @Get("/")
-  async home(@Req() req, @Res() reply: Reply) {
+  async renderHome(@Req() req, @Res() reply: Reply) {
     const cache = safeParse(await this.redis.get(req.url));
     if (cache) {
       return reply.view(`${this.sharedVars.theme}/index`, cache);
     }
-    const { posts, hasPrevPage, hasNextPage } = await this.webService.findPosts(1);
-    const data = {
-      ...this.sharedVars,
-      hasNextPage,
-      hasPrevPage,
-      posts,
-    };
+    const pageIndex = 1;
+    const data = await this.findPostsByPageIndex(pageIndex);
+    await this.redis.set(req.url, safeStringify(data));
+    return reply.view(`${this.sharedVars.theme}/index`, data);
+  }
+
+  @ApiExcludeEndpoint()
+  @Get("/p/:pageIndex")
+  async renderPaginate(@Req() req, @Param("pageIndex") pageIndex, @Res() reply: Reply) {
+    const cache = safeParse(await this.redis.get(req.url));
+    if (cache) {
+      return reply.view(`${this.sharedVars.theme}/index`, cache);
+    }
+    const data = await this.findPostsByPageIndex(pageIndex);
     await this.redis.set(req.url, safeStringify(data));
     return reply.view(`${this.sharedVars.theme}/index`, data);
   }
 
   @ApiExcludeEndpoint()
   @Get("post/:input")
-  async blog(@Req() req, @Param("input") input, @Res() reply) {
+  async renderPost(@Req() req, @Param("input") input, @Res() reply) {
     const cache = safeParse(await this.redis.get(req.url));
     if (cache) {
       return reply.view(`${this.sharedVars.theme}/post`, cache);
@@ -56,7 +74,7 @@ export class WebController {
 
   @ApiExcludeEndpoint()
   @Get("page/:input")
-  async singlePage(@Req() req, @Param("input") input, @Res() reply) {
+  async renderPage(@Req() req, @Param("input") input, @Res() reply) {
     const cache = safeParse(await this.redis.get(req.url));
     if (cache) {
       return reply.view(`${this.sharedVars.theme}/page`, cache);
