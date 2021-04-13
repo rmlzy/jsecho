@@ -1,11 +1,11 @@
 import { HttpException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { In, Not, Repository } from "typeorm";
+import { Not, Repository } from "typeorm";
 import { keyBy } from "lodash";
 import { BaseService } from "@/base";
 import { isNotXss, generateHashedPassword } from "@/utils";
-import { UpdateProfileDto } from "../public/public-api/dto/update-profile.dto";
-import { UpdatePasswordDto } from "../public/public-api/dto/update-password.dto";
+import { UpdateProfileDto } from "@/modules/auth/dto/update-profile.dto";
+import { UpdatePasswordDto } from "@/modules/auth/dto/update-password.dto";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { UserMapVo } from "./vo/create-user.vo";

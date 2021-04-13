@@ -1,12 +1,11 @@
 import { Injectable } from "@nestjs/common";
-import { md2html } from "@/utils";
-import { OptionsService } from "../../options/options.service";
-import { ContentsService } from "../../contents/contents.service";
-import { IPaginate, IContent } from "./interface/public-view.interface";
 import { RedisService } from "nestjs-redis";
+import { OptionsService } from "@/modules/options/options.service";
+import { ContentsService } from "@/modules/contents/contents.service";
+import { IContent, IPaginate } from "./interface/web.interface";
 
 @Injectable()
-export class PublicViewService {
+export class WebService {
   sharedVars = null;
 
   constructor(
@@ -16,11 +15,11 @@ export class PublicViewService {
   ) {}
 
   async findSharedVars() {
-    const redis = await this.redisService.getClient();
-    const sharedVars = await redis.get("sharedVars");
-    if (sharedVars) {
-      return JSON.parse(sharedVars);
-    }
+    // const redis = await this.redisService.getClient();
+    // const sharedVars = await redis.get("sharedVars");
+    // if (sharedVars) {
+    //   return JSON.parse(sharedVars);
+    // }
 
     const siteConfig = await this.optionService.findSiteConfig();
     const pages = await this.contentService.findPages();
@@ -29,7 +28,7 @@ export class PublicViewService {
       pages,
       theme: "default",
     };
-    await redis.set("sharedVars", JSON.stringify(sharedVars));
+    // await redis.set("sharedVars", JSON.stringify(sharedVars));
     return vars;
   }
 

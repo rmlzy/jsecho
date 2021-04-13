@@ -15,9 +15,9 @@ import { AuthModule } from "./modules/auth/auth.module";
 import { ContentsModule } from "./modules/contents/contents.module";
 import { MetasModule } from "./modules/metas/metas.module";
 import { OptionsModule } from "./modules/options/options.module";
-import { PublicModule } from "./modules/public/public.module";
 import { RelationshipsModule } from "./modules/relationships/relationships.module";
 import { UsersModule } from "./modules/users/users.module";
+import { WebModule } from "./modules/web/web.module";
 
 // Entities
 import { ContentEntity } from "./modules/contents/entity/content.entity";
@@ -74,7 +74,7 @@ import { UserEntity } from "./modules/users/entity/user.entity";
     MetasModule,
     ContentsModule,
     RelationshipsModule,
-    PublicModule,
+    WebModule,
   ],
   controllers: [AppController],
   providers: [
