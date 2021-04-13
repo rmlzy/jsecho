@@ -8,7 +8,9 @@ import { safeParse, safeStringify } from "@/utils";
 
 @Controller("")
 export class WebController {
-  sharedVars: ISharedVars = {};
+  sharedVars: ISharedVars = {
+    theme: "default",
+  };
   redis = null;
 
   constructor(private webService: WebService, private redisService: RedisService) {
@@ -66,5 +68,10 @@ export class WebController {
     };
     await this.redis.set(req.url, safeStringify(data));
     return reply.view(`${this.sharedVars.theme}/page`, data);
+  }
+
+  @Get("/404")
+  async render404(@Res() reply) {
+    return reply.view(`${this.sharedVars.theme}/404`);
   }
 }

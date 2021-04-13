@@ -12,6 +12,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
     console.log("-----------------------------");
     console.log(exception);
     console.log("-----------------------------");
+    if (status === 404) {
+      reply.redirect("/404");
+      return;
+    }
     reply.code(200).send({
       code: status,
       message: exception.message,
