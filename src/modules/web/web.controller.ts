@@ -2,7 +2,7 @@ import { Controller, Get, Param, Req, Res } from "@nestjs/common";
 import { ApiExcludeEndpoint } from "@nestjs/swagger";
 import { Reply } from "@/base";
 import { WebService } from "./web.service";
-import { ISharedVars } from "./interface/web.interface";
+import { ISharedVars } from "./web.interface";
 import { RedisService } from "nestjs-redis";
 import { safeParse, safeStringify } from "@/utils";
 

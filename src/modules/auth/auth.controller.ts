@@ -2,14 +2,14 @@ import { Body, Controller, Get, Headers, HttpStatus, Patch, Post, UseGuards } fr
 import { ApiOperation } from "@nestjs/swagger";
 import { LoggedGuard } from "@/guards";
 import { AuthService } from "../auth/auth.service";
-import { UsersService } from "../users/users.service";
+import { UserService } from "../user/user.service";
 import { LoginDto } from "./dto/login.dto";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { UpdatePasswordDto } from "./dto/update-password.dto";
 
 @Controller("auth")
 export class AuthController {
-  constructor(private authService: AuthService, private userService: UsersService) {}
+  constructor(private authService: AuthService, private userService: UserService) {}
 
   @ApiOperation({ description: "登录" })
   @Post("/login")

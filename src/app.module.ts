@@ -12,19 +12,19 @@ import { TaskService } from "./schedules/task/task.service";
 
 // Modules
 import { AuthModule } from "./modules/auth/auth.module";
-import { ContentsModule } from "./modules/contents/contents.module";
-import { MetasModule } from "./modules/metas/metas.module";
-import { OptionsModule } from "./modules/options/options.module";
-import { RelationshipsModule } from "./modules/relationships/relationships.module";
-import { UsersModule } from "./modules/users/users.module";
+import { ContentModule } from "./modules/content/content.module";
+import { MetaModule } from "./modules/meta/meta.module";
+import { OptionModule } from "./modules/option/option.module";
+import { RelationshipModule } from "./modules/relationship/relationship.module";
+import { UserModule } from "./modules/user/user.module";
 import { WebModule } from "./modules/web/web.module";
 
 // Entities
-import { ContentEntity } from "./modules/contents/entity/content.entity";
-import { MetaEntity } from "./modules/metas/entity/meta.entity";
-import { OptionEntity } from "./modules/options/entity/option.entity";
-import { RelationshipEntity } from "./modules/relationships/entity/relationship.entity";
-import { UserEntity } from "./modules/users/entity/user.entity";
+import { ContentEntity } from "./modules/content/content.entity";
+import { MetaEntity } from "./modules/meta/meta.entity";
+import { OptionEntity } from "./modules/option/option.entity";
+import { RelationshipEntity } from "./modules/relationship/relationship.entity";
+import { UserEntity } from "./modules/user/user.entity";
 
 @Module({
   imports: [
@@ -68,12 +68,12 @@ import { UserEntity } from "./modules/users/entity/user.entity";
     }),
     ScheduleModule.forRoot(),
     HttpModule,
-    UsersModule,
+    UserModule,
     AuthModule,
-    OptionsModule,
-    MetasModule,
-    ContentsModule,
-    RelationshipsModule,
+    OptionModule,
+    MetaModule,
+    ContentModule,
+    RelationshipModule,
     WebModule,
   ],
   controllers: [AppController],

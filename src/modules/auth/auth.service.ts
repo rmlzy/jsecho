@@ -3,14 +3,14 @@ import { JwtService } from "@nestjs/jwt";
 import { BaseService } from "@/base";
 import { verifyUserPassword, sleep } from "@/utils";
 import { ALLOW_LOGIN_GROUPS } from "@/constants";
-import { UsersService } from "../users/users.service";
-import { IUserGroup } from "../users/interface/user.interface";
+import { UserService } from "../user/user.service";
+import { IUserGroup } from "../user/user.interface";
 import { LoginDto } from "./dto/login.dto";
-import { IJwtPayload } from "./interface/auth.interface";
+import { IJwtPayload } from "./auth.interface";
 
 @Injectable()
 export class AuthService extends BaseService<any> {
-  constructor(private userService: UsersService, private jwtService: JwtService) {
+  constructor(private userService: UserService, private jwtService: JwtService) {
     super(null);
   }
 

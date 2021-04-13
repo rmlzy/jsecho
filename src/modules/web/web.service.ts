@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { RedisService } from "nestjs-redis";
-import { OptionsService } from "@/modules/options/options.service";
-import { ContentsService } from "@/modules/contents/contents.service";
-import { IContent, IPaginate } from "./interface/web.interface";
-import { ISharedVars } from "./interface/web.interface";
+import { OptionService } from "@/modules/option/option.service";
+import { ContentService } from "@/modules/content/content.service";
+import { IContent, IPaginate } from "./web.interface";
+import { ISharedVars } from "./web.interface";
 import { safeParse, safeStringify } from "@/utils";
 
 @Injectable()
@@ -11,8 +11,8 @@ export class WebService {
   redis = null;
 
   constructor(
-    private optionService: OptionsService,
-    private contentService: ContentsService,
+    private optionService: OptionService,
+    private contentService: ContentService,
     private redisService: RedisService,
   ) {
     this.redis = redisService.getClient();
